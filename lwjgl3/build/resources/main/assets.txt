@@ -1,0 +1,75 @@
+.gitkeep
+1.png
+289721-Select-heavy-complex-hi-tech-tone-04.mp3
+289721-Select-heavy-complex-hi-tech-tone-04.wav
+519a1d31-3b60-4d91-a7d5-4decf10051bf.jpg
+Angry-Birds-Theme-Song-Sound-Effect.mp3
+EXIT_FINAL_BUTTON-removebg-preview.png
+HOMESCREEN (1).png
+HOMESCREEN (2).png
+HOMESCREEN.jpg
+HOMESCREEN.png
+LEVELS_BUTTON-Photoroom.png
+LOAD-SAVED-removebg-preview (1).png
+Play_final_button-removebg-preview.png
+RESUME_BUTTON-Photoroom.png
+RETRY_BUTTON_FINAL-removebg-preview.png
+SAVE_BUTTON_FINAL.png
+Screenshot_2024-10-21_at_4.08.03_PM-removebg-preview.png
+Screenshot_2024-10-21_at_4.13.28_PM-removebg-preview.png
+Screenshot_2024-10-21_at_4.13.41_PM-removebg-preview (1).png
+Screenshot_2024-10-24_092517-removebg-preview.png
+Screenshot_2024-10-24_092530-removebg-preview.png
+Screenshot_2024-10-24_093545-removebg-preview (1).png
+Untitled design (1).png
+Untitled design (2).png
+Untitled design.png
+angry-bird-game-1_magic (1).png
+angry-birds-png-angry-birds-super-logo-png-818.png
+angrybirdslevel1.jpg
+angrylevel1.jpg
+backbutton.png
+backbuttonremoved.png
+background.png
+background2.png
+bird.png
+bird1.png
+bird2.png
+bird3.png
+birdbackground.png
+birdbackground.webp
+birdslevel.png
+birdsselectionlevel.jpg
+chuckbird.png
+chuckfinal.png
+chuckhover.png
+desktop-wallpaper-angry-birds-game-angry-birds.jpg
+haystack.png
+image-removebg-preview.png
+image.png
+imresizer-1729495518724.jpg
+levelbutton.png
+levelfnial.png
+levelhoevrinfla.png
+loading.png
+pausebutton.png
+pig1.png
+pig2.png
+pig3.png
+pig4.png
+pigbackground.png
+pigslevel.png
+slingshot.png
+slypig.png
+slypigfinal.png
+slypighover.png
+ui/font-list.fnt
+ui/font-subtitle.fnt
+ui/font-window.fnt
+ui/font.fnt
+ui/uiskin.atlas
+ui/uiskin.json
+ui/uiskin.png
+wallpaperflare.com_wallpaper.jpg
+wood.png
+woodhor.png

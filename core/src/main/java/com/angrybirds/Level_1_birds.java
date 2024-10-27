@@ -57,7 +57,6 @@ public class Level_1_birds implements Screen {
 
     @Override
     public void show() {
-        // Load background and initialize camera
         backgroundTexture = new Texture(Gdx.files.internal("birdbackground.png"));
         spriteBatch = new SpriteBatch();
         camera = new OrthographicCamera();
@@ -76,11 +75,6 @@ public class Level_1_birds implements Screen {
         wood3= new WoodStructure(world,6.55f,1.21f,0.2f,0.6f);
 
 
-
-
-
-
-        // Create the stage and UI elements
         stage = new Stage(viewport);
         Gdx.input.setInputProcessor(stage);
 
@@ -114,28 +108,22 @@ public class Level_1_birds implements Screen {
     public void render(float delta) {
         ScreenUtils.clear(Color.BLACK);
 
-        // Step the physics simulation
         world.step(1 / 60f, 6, 2);
 
-        // Update camera and SpriteBatch
         camera.update();
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
 
-        // Draw the background
         spriteBatch.draw(backgroundTexture, 0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
 
-        // Draw the bird and pig textures at the correct positions
         Vector2 RedbirdPosition = bird1.getPosition();
         Vector2 YellowbirdPosition = bird2.getPosition();
         Vector2 SmallpigPosition = pig1.getPosition();
 
-        // Dynamically draw birds and pig
         spriteBatch.draw(bird1.getTexture(), RedbirdPosition.x * 100 - 25, RedbirdPosition.y * 100 - 25, 50 ,50);
         spriteBatch.draw(bird2.getTexture(), YellowbirdPosition.x * 100 - 25, YellowbirdPosition.y * 100 - 25, 50, 50);
         spriteBatch.draw(pig1.getTexture(), SmallpigPosition.x * 100 - 25, SmallpigPosition.y * 100 - 25,50, 50);
 
-        // Draw the wood structures with dynamic sizes
         Vector2 wood1Position = wood1.getPosition();
         Vector2 wood2Position = wood2.getPosition();
         Vector2 wood3Position = wood3.getPosition();
@@ -149,7 +137,6 @@ public class Level_1_birds implements Screen {
 
         spriteBatch.end();
 
-        // Render the stage (UI elements)
         stage.act(delta);
         stage.draw();
     }

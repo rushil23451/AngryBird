@@ -3,7 +3,7 @@ package com.angrybirds;
 import com.badlogic.gdx.Game;
 
 public class Main extends Game {
-    private int saveLevel = -1; // Variable to store the saved level
+    private int saveLevel = -1;
 
     @Override
     public void create() {
@@ -16,17 +16,17 @@ public class Main extends Game {
 
     private void loadSavedLevel() {
         if (saveLevel != -1) {
-            // Load the saved level based on saveLevel
+
             switch (saveLevel) {
                 case 1:
-                    setScreen(new Level_1(this)); // Load Level 1
+                    setScreen(new Level_1(this));
                     break;
-                // Add more cases if you have more levels
+
                 default:
-                    setScreen(new FirstScreen(this)); // Fallback to main menu or any other screen
+                    setScreen(new FirstScreen(this));
             }
         } else {
-            setScreen(new FirstScreen(this)); // No saved level, go to the main menu
+            setScreen(new FirstScreen(this));
         }
     }
 }

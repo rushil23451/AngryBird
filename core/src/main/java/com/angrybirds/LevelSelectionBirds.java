@@ -22,8 +22,8 @@ public class LevelSelectionBirds implements Screen {
     private Texture level2ButtonTexture;
     private Texture level3ButtonTexture;
     private Texture lockedlevelButtonTexture;
-    private Texture chuckBirdTexture; // Load the chuckbird texture
-    private Texture backButtonTexture; // Texture for back button
+    private Texture chuckBirdTexture;
+    private Texture backButtonTexture;
     private SpriteBatch spriteBatch;
     private OrthographicCamera camera;
     private Viewport viewport;
@@ -44,7 +44,7 @@ public class LevelSelectionBirds implements Screen {
 
     @Override
     public void show() {
-        // Load textures
+
         backgroundTexture = new Texture(Gdx.files.internal("Untitled design (1).png"));
         levelButtonTexture = new Texture(Gdx.files.internal("1.png"));
         level2ButtonTexture = new Texture(Gdx.files.internal("Screenshot_2024-10-24_092517-removebg-preview.png"));
@@ -60,11 +60,10 @@ public class LevelSelectionBirds implements Screen {
         stage = new Stage(viewport);
         Gdx.input.setInputProcessor(stage);
 
-        // Level button size (unchanged)
-        float buttonWidth = 60;  // Size of levelButton1
-        float buttonHeight = 60; // Size of levelButton1
 
-        // Button 1: Level button 1
+        float buttonWidth = 60;
+        float buttonHeight = 60;
+
         ImageButton levelButton1 = new ImageButton(new TextureRegionDrawable(levelButtonTexture));
         levelButton1.setPosition(335, 30);
         levelButton1.setSize(buttonWidth, buttonHeight);
@@ -72,25 +71,25 @@ public class LevelSelectionBirds implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 System.out.println("Level 1 selected");
-                game.setScreen(new Level_1_birds(game)); // Redirect to Level_1
+                game.setScreen(new Level_1_birds(game));
             }
 
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                // Increase the size of levelButton1
+
                 levelButton1.setSize(buttonWidth + 15, buttonHeight + 15); // Increase size by 15 pixels
                 levelButton1.setPosition(levelButton1.getX() - 7.5f, levelButton1.getY() - 7.5f); // Center the button
             }
 
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-                // Reset the size of levelButton1
+
                 levelButton1.setSize(buttonWidth, buttonHeight); // Reset size
                 levelButton1.setPosition(levelButton1.getX() + 7.5f, levelButton1.getY() + 7.5f); // Center the button back
             }
         });
 
-        // Button 2: Level button 2
+
         ImageButton levelButton2 = new ImageButton(new TextureRegionDrawable(level2ButtonTexture));
         levelButton2.setPosition(510, 80);
         levelButton2.setSize(buttonWidth, buttonHeight);
@@ -98,7 +97,7 @@ public class LevelSelectionBirds implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 System.out.println("Level 2 selected");
-                // Implement redirection to Level 2
+
             }
         });
 
@@ -110,40 +109,40 @@ public class LevelSelectionBirds implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 System.out.println("Level 3 selected");
-                // Implement redirection to Level 3
+
             }
         });
 
         // Create BACK button as an ImageButton
         final ImageButton backButton = new ImageButton(new TextureRegionDrawable(backButtonTexture));
-        backButton.setPosition(20, 20); // Bottom left position
-        backButton.setSize(115, 65); // Original size increased by 15 pixels
+        backButton.setPosition(20, 20);
+        backButton.setSize(115, 65);
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 System.out.println("Back button clicked");
-                game.setScreen(new PlayAsScreen(game)); // Change to your main menu screen
+                game.setScreen(new PlayAsScreen(game));
             }
 
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                backButton.setSize(backButton.getWidth() - 15, backButton.getHeight() - 15); // Reduce size by 15 pixels
-                backButton.setPosition(backButton.getX() + 7.5f, backButton.getY() + 7.5f); // Center the button
+                backButton.setSize(backButton.getWidth() - 15, backButton.getHeight() - 15);
+                backButton.setPosition(backButton.getX() + 7.5f, backButton.getY() + 7.5f);
             }
 
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-                backButton.setSize(backButton.getWidth() + 15, backButton.getHeight() + 15); // Reset size back to original
-                backButton.setPosition(backButton.getX() - 7.5f, backButton.getY() - 7.5f); // Center the button back
+                backButton.setSize(backButton.getWidth() + 15, backButton.getHeight() + 15);
+                backButton.setPosition(backButton.getX() - 7.5f, backButton.getY() - 7.5f);
             }
         });
 
 
-        // Add buttons to the stage
+
         stage.addActor(levelButton1);
         stage.addActor(levelButton2);
         stage.addActor(levelButton3);
-        stage.addActor(backButton); // Add back button to the stage
+        stage.addActor(backButton);
     }
 
     @Override
@@ -153,7 +152,6 @@ public class LevelSelectionBirds implements Screen {
         spriteBatch.setProjectionMatrix(camera.combined);
 
         spriteBatch.begin();
-        // Draw background
         spriteBatch.draw(backgroundTexture, 0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
         spriteBatch.end();
 
@@ -176,8 +174,8 @@ public class LevelSelectionBirds implements Screen {
         level2ButtonTexture.dispose();
         level3ButtonTexture.dispose();
         lockedlevelButtonTexture.dispose();
-        chuckBirdTexture.dispose(); // Dispose of chuckbird texture
-        backButtonTexture.dispose(); // Dispose of back button texture
+        chuckBirdTexture.dispose();
+        backButtonTexture.dispose();
         spriteBatch.dispose();
         stage.dispose();
     }

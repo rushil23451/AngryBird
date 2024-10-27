@@ -59,21 +59,18 @@ public class Level_1 implements Screen {
         pauseButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                System.out.println("Pause button clicked"); // Print message to terminal
-                // Redirect to PauseScreen when the pause button is clicked
+                System.out.println("Pause button clicked");
                 game.setScreen(new PauseScreen(game));
             }
 
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                // Increase the size of the pause button
                 pauseButton.setSize(115, 115); // Increase size by 15 pixels
                 pauseButton.setPosition(pauseButton.getX() - 7.5f, pauseButton.getY() - 7.5f); // Center the button
             }
 
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-                // Reset the size of the pause button
                 pauseButton.setSize(100, 100); // Reset size
                 pauseButton.setPosition(pauseButton.getX() + 7.5f, pauseButton.getY() + 7.5f); // Center the button back
             }

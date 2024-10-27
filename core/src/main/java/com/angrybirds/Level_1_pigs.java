@@ -40,7 +40,7 @@ public class Level_1_pigs implements Screen {
 
 
     private Chainsawpig pig1;
-    private MissilePig pig2;// Bird instance
+    private MissilePig pig2;
 
     public Level_1_pigs(Main game) {
         this.game = game;
@@ -57,7 +57,7 @@ public class Level_1_pigs implements Screen {
 
     @Override
     public void show() {
-        // Load background and initialize camera
+
         backgroundTexture = new Texture(Gdx.files.internal("pigbackground.png"));
         spriteBatch = new SpriteBatch();
         camera = new OrthographicCamera();
@@ -65,7 +65,6 @@ public class Level_1_pigs implements Screen {
         camera.position.set(VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT / 2, 0);
         camera.update();
 
-        // Initialize Box2D world and Bird object
         world = new World(new Vector2(0, -9.8f), true);
         bird1 = new RedBird(world, 6f,1.91f);
         bird2= new YellowBird(world,6.75f,1.93f);
@@ -77,10 +76,6 @@ public class Level_1_pigs implements Screen {
 
 
 
-
-
-
-        // Create the stage and UI elements
         stage = new Stage(viewport);
         Gdx.input.setInputProcessor(stage);
 
@@ -92,7 +87,7 @@ public class Level_1_pigs implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 System.out.println("Pause button clicked");
-                game.setScreen(new PauseScreen(game));
+                game.setScreen(new PauseScreen1(game));
             }
 
             @Override
@@ -114,18 +109,14 @@ public class Level_1_pigs implements Screen {
     public void render(float delta) {
         ScreenUtils.clear(Color.BLACK);
 
-        // Step the physics simulation
         world.step(1 / 60f, 6, 2);
 
-        // Update camera and SpriteBatch
         camera.update();
         spriteBatch.setProjectionMatrix(camera.combined);
         spriteBatch.begin();
 
-        // Draw the background
         spriteBatch.draw(backgroundTexture, 0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
 
-        // Draw the bird texture at the bird's physics body's position
         Vector2 RedbirdPosition = bird1.getPosition();
         Vector2 YellowbirdPosition = bird2.getPosition();
 
@@ -136,12 +127,6 @@ public class Level_1_pigs implements Screen {
 
         Vector2 wood2Position = wood2.getPosition();
         Vector2 wood3Position = wood3.getPosition();
-
-
-
-
-
-
 
         spriteBatch.draw(bird1.getTexture(), RedbirdPosition.x * 100 - 25, RedbirdPosition.y * 100 - 25, 50, 50);
         spriteBatch.draw(bird2.getTexture(), YellowbirdPosition.x * 100 - 25, YellowbirdPosition.y * 100 - 25, 50, 50);
@@ -157,7 +142,6 @@ public class Level_1_pigs implements Screen {
 
         spriteBatch.end();
 
-        // Render the stage (UI elements)
         stage.act(delta);
         stage.draw();
     }

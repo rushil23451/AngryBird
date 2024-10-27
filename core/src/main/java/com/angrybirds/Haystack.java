@@ -22,25 +22,24 @@ public class Haystack {
         this.width=width;
         this.height=height;
 
-        // Define the body for the wood structure
         BodyDef woodBodyDef = new BodyDef();
-        woodBodyDef.type = BodyType.StaticBody;  // Static body since the wood is not movable
-        woodBodyDef.position.set(x, y);          // Position the wood piece at (x, y)
+        woodBodyDef.type = BodyType.StaticBody;
+        woodBodyDef.position.set(x, y);
 
-        // Create the shape and fixture for the wood
+
         shape = new PolygonShape();
-        shape.setAsBox(width / 2, height / 2);   // Define the width and height of the wood structure
+        shape.setAsBox(width / 2, height / 2);
 
         FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.density = 0.5f;               // Wood can have a lower density
+        fixtureDef.density = 0.5f;
         fixtureDef.shape = shape;
         fixtureDef.friction = 0.4f;
-        fixtureDef.restitution = 0.1f;           // Less bouncy for wood
+        fixtureDef.restitution = 0.1f;
 
-        // Create the wood's physics body in the world
+
         woodBody = world.createBody(woodBodyDef);
         woodBody.createFixture(fixtureDef);
-        shape.dispose();  // Dispose of the shape after using it
+        shape.dispose();
     }
     public float getWidth() {
         return this.width;

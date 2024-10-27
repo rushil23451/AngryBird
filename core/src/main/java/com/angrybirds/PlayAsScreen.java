@@ -20,7 +20,7 @@ public class PlayAsScreen implements Screen {
     private Texture backgroundTexture;
     private Texture chuckbirdTexture;
     private Texture slypigTexture;
-    private Texture backButtonTexture; // Add texture for the back button
+    private Texture backButtonTexture;
     private SpriteBatch spriteBatch;
     private OrthographicCamera camera;
     private Viewport viewport;
@@ -45,7 +45,7 @@ public class PlayAsScreen implements Screen {
         backgroundTexture = new Texture(Gdx.files.internal("background2.png"));
         chuckbirdTexture = new Texture(Gdx.files.internal("chuckbird.png"));
         slypigTexture = new Texture(Gdx.files.internal("slypig.png"));
-        backButtonTexture = new Texture(Gdx.files.internal("backbuttonremoved.png")); // Load back button texture
+        backButtonTexture = new Texture(Gdx.files.internal("backbuttonremoved.png"));
         spriteBatch = new SpriteBatch();
 
         camera = new OrthographicCamera();
@@ -56,7 +56,6 @@ public class PlayAsScreen implements Screen {
         stage = new Stage(viewport);
         Gdx.input.setInputProcessor(stage);
 
-        // Chuckbird button
         final ImageButton chuckbirdButton = new ImageButton(new TextureRegionDrawable(chuckbirdTexture));
         chuckbirdButton.setPosition(200, 200);
         chuckbirdButton.setSize(150, 150);
@@ -80,7 +79,7 @@ public class PlayAsScreen implements Screen {
             }
         });
 
-        // Slypig button
+
         final ImageButton slypigButton = new ImageButton(new TextureRegionDrawable(slypigTexture));
         slypigButton.setPosition(450, 200);
         slypigButton.setSize(150, 150);
@@ -104,35 +103,34 @@ public class PlayAsScreen implements Screen {
             }
         });
 
-        // Back button
-        // Back button
+
         final ImageButton backButton = new ImageButton(new TextureRegionDrawable(backButtonTexture));
-        backButton.setPosition(20, 20); // Bottom left position
-        backButton.setSize(115, 65); // Original size increased by 15 pixels
+        backButton.setPosition(20, 20);
+        backButton.setSize(115, 65);
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 System.out.println("Back button clicked");
-                game.setScreen(new FirstScreen(game)); // Change to your main menu screen
+                game.setScreen(new FirstScreen(game));
             }
 
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                backButton.setSize(backButton.getWidth() - 15, backButton.getHeight() - 15); // Reduce size by 15 pixels
-                backButton.setPosition(backButton.getX() + 7.5f, backButton.getY() + 7.5f); // Center the button
+                backButton.setSize(backButton.getWidth() - 15, backButton.getHeight() - 15);
+                backButton.setPosition(backButton.getX() + 7.5f, backButton.getY() + 7.5f);
             }
 
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-                backButton.setSize(backButton.getWidth() + 15, backButton.getHeight() + 15); // Reset size back to original
-                backButton.setPosition(backButton.getX() - 7.5f, backButton.getY() - 7.5f); // Center the button back
+                backButton.setSize(backButton.getWidth() + 15, backButton.getHeight() + 15);
+                backButton.setPosition(backButton.getX() - 7.5f, backButton.getY() - 7.5f);
             }
         });
 
 
         stage.addActor(chuckbirdButton);
         stage.addActor(slypigButton);
-        stage.addActor(backButton); // Add the back button to the stage
+        stage.addActor(backButton);
     }
 
     @Override
@@ -163,7 +161,7 @@ public class PlayAsScreen implements Screen {
         backgroundTexture.dispose();
         chuckbirdTexture.dispose();
         slypigTexture.dispose();
-        backButtonTexture.dispose(); // Dispose of the back button texture
+        backButtonTexture.dispose();
         spriteBatch.dispose();
         stage.dispose();
     }

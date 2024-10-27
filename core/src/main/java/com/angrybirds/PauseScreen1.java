@@ -61,17 +61,15 @@ public class PauseScreen1 implements Screen {
         stage = new Stage(viewport);
         Gdx.input.setInputProcessor(stage);
 
-        // Increased button size by 15 pixels (previously 160x85, now 165x90)
-        float buttonWidth = 165; // Larger by 5 pixels
-        float buttonHeight = 90; // Larger by 5 pixels
 
-        // Reduce spacing between buttons from 5 to 2 pixels
-        float topOffset = 100; // Starting position for RESUME button
-        float spacing = 2; // Reduced space between buttons
+        float buttonWidth = 165;
+        float buttonHeight = 90;
 
-        // Adjust the positions for all buttons accordingly
 
-        // Create RESUME button
+        float topOffset = 100;
+        float spacing = 2;
+
+
         ImageButton resumeButton = new ImageButton(new TextureRegionDrawable(resumeButtonTexture));
         resumeButton.setSize(buttonWidth, buttonHeight);
         resumeButton.setPosition(VIRTUAL_WIDTH / 2 - buttonWidth / 2, VIRTUAL_HEIGHT - topOffset);
@@ -95,7 +93,7 @@ public class PauseScreen1 implements Screen {
             }
         });
 
-        // Create RETRY button
+
         ImageButton retryButton = new ImageButton(new TextureRegionDrawable(retryButtonTexture));
         retryButton.setSize(buttonWidth, buttonHeight);
         retryButton.setPosition(VIRTUAL_WIDTH / 2 - buttonWidth / 2, VIRTUAL_HEIGHT - topOffset - buttonHeight - spacing);
@@ -119,8 +117,6 @@ public class PauseScreen1 implements Screen {
             }
         });
 
-        // Create SAVE button
-        // Create SAVE button
         ImageButton saveButton = new ImageButton(new TextureRegionDrawable(saveButtonTexture));
         saveButton.setSize(buttonWidth, buttonHeight);
         saveButton.setPosition(VIRTUAL_WIDTH / 2 - buttonWidth / 2, VIRTUAL_HEIGHT - topOffset - 2 * (buttonHeight + spacing));
@@ -128,7 +124,7 @@ public class PauseScreen1 implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 System.out.println("SAVE button clicked");
-                // Redirect to FirstScreen when SAVE button is clicked
+
                 game.setScreen(new FirstScreen(game));
             }
 
@@ -146,7 +142,6 @@ public class PauseScreen1 implements Screen {
         });
 
 
-        // Create LEVELS button
         ImageButton levelsButton = new ImageButton(new TextureRegionDrawable(levelsButtonTexture));
         levelsButton.setSize(buttonWidth, buttonHeight);
         levelsButton.setPosition(VIRTUAL_WIDTH / 2 - buttonWidth / 2, VIRTUAL_HEIGHT - topOffset - 3 * (buttonHeight + spacing));
@@ -170,7 +165,7 @@ public class PauseScreen1 implements Screen {
             }
         });
 
-        // Add buttons to the stage
+
         stage.addActor(resumeButton);
         stage.addActor(retryButton);
         stage.addActor(saveButton);
@@ -202,7 +197,7 @@ public class PauseScreen1 implements Screen {
         resumeButtonTexture.dispose();
         retryButtonTexture.dispose();
         levelsButtonTexture.dispose();
-        saveButtonTexture.dispose(); // Dispose of SAVE button texture
+        saveButtonTexture.dispose();
         spriteBatch.dispose();
         stage.dispose();
     }

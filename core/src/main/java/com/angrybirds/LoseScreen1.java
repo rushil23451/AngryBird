@@ -13,40 +13,39 @@ public class LoseScreen1 implements Screen {
     private Main game;
 
     public LoseScreen1(Main game) {
-        this.game = game; // Reference to the main game instance
-        // Initialize SpriteBatch and load the background texture
+        this.game = game;
+
         batch = new SpriteBatch();
         backgroundTexture = new Texture(Gdx.files.internal("pig-happy-angry-birds-28211886-1920-1200.jpg"));
 
-        // Schedule the transition back to Level_1 after 1.5 seconds
+
         Timer.schedule(new Timer.Task() {
             @Override
             public void run() {
-                game.setScreen(new Level_1_birds(game)); // Redirect to Level_1
+                game.setScreen(new Level_1_birds(game));
             }
-        }, 1.5f); // 1.5 seconds delay
+        }, 1.5f);
     }
 
     @Override
     public void show() {
-        // Called when the screen is displayed
+
     }
 
     @Override
     public void render(float delta) {
-        // Begin the SpriteBatch
+
         batch.begin();
 
-        // Draw the background image stretched to cover the entire screen
+
         batch.draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-        // End the SpriteBatch
         batch.end();
     }
 
     @Override
     public void resize(int width, int height) {
-        // Handle resizing if necessary
+
     }
 
     @Override
@@ -60,7 +59,7 @@ public class LoseScreen1 implements Screen {
 
     @Override
     public void dispose() {
-        // Dispose of resources when no longer needed
+
         batch.dispose();
         backgroundTexture.dispose();
     }

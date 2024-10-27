@@ -17,12 +17,10 @@ public class Chainsawpig {
     public Chainsawpig(World world, float x, float y) {
         birdTexture = new Texture(Gdx.files.internal("pig2.png"));
 
-        // Define the body
         BodyDef birdBodyDef = new BodyDef();
         birdBodyDef.type = BodyType.StaticBody;
         birdBodyDef.position.set(x, y);
 
-        // Create the shape and fixture
         shape = new CircleShape();
         shape.setRadius(5f);
 
@@ -32,10 +30,9 @@ public class Chainsawpig {
         fixtureDef.friction = 0.25f;
         fixtureDef.restitution = 0.75f;
 
-        // Create the bird's physics body in the world
         birdBody = world.createBody(birdBodyDef);
         birdBody.createFixture(fixtureDef);
-        shape.dispose();  // Dispose the shape after using it
+        shape.dispose();
     }
 
     public Vector2 getPosition() {

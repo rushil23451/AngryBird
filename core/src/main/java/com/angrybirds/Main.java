@@ -19,7 +19,7 @@ public class Main extends Game {
             // Load the saved level based on saveLevel
             switch (saveLevel) {
                 case 1:
-                    setScreen(new Level_1_birds(this)); // Load Level 1
+                    setScreen(new Level_1(this)); // Load Level 1
                     break;
                 // Add more cases if you have more levels
                 default:

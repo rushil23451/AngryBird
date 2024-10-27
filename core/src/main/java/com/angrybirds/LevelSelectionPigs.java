@@ -19,6 +19,11 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 public class LevelSelectionPigs implements Screen {
     private Texture backgroundTexture;
     private Texture levelButtonTexture;
+    private Texture level2ButtonTexture;
+    private Texture level3ButtonTexture;
+    private Texture lockedlevelButtonTexture;
+    private Texture chuckBirdTexture; // Load the chuckbird texture
+    private Texture backButtonTexture; // Texture for back button
     private SpriteBatch spriteBatch;
     private OrthographicCamera camera;
     private Viewport viewport;
@@ -32,21 +37,19 @@ public class LevelSelectionPigs implements Screen {
     }
 
     @Override
-    public void resume() {
-        // Code to handle resume can go here if needed
-    }
+    public void resume() {}
 
     @Override
-    public void hide() {
-        // Code to handle hiding this screen can go here if needed
-    }
+    public void hide() {}
 
     @Override
     public void show() {
         // Load textures
-        backgroundTexture = new Texture(Gdx.files.internal("pigslevel.png"));
-        levelButtonTexture = new Texture(Gdx.files.internal("levelbutton.png"));
-
+        backgroundTexture = new Texture(Gdx.files.internal("Angry_village1.png"));
+        levelButtonTexture = new Texture(Gdx.files.internal("1pigsbg.png"));
+        level2ButtonTexture = new Texture(Gdx.files.internal("2pigsbg.png"));
+        level3ButtonTexture = new Texture(Gdx.files.internal("3pigsbg.png"));
+        backButtonTexture = new Texture(Gdx.files.internal("backbuttonremoved.png")); // Load back button texture
         spriteBatch = new SpriteBatch();
         camera = new OrthographicCamera();
         viewport = new StretchViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, camera);
@@ -56,21 +59,94 @@ public class LevelSelectionPigs implements Screen {
         stage = new Stage(viewport);
         Gdx.input.setInputProcessor(stage);
 
-        // Level button
-        final ImageButton levelButton = new ImageButton(new TextureRegionDrawable(levelButtonTexture));
-        levelButton.setPosition(200, 200);
-        levelButton.setSize(150, 150);
-        levelButton.addListener(new ClickListener() {
+        // Level button size (unchanged)
+        float buttonWidth = 60;  // Size of levelButton1
+        float buttonHeight = 60; // Size of levelButton1
+
+        // Button 1: Level button 1
+        ImageButton levelButton1 = new ImageButton(new TextureRegionDrawable(levelButtonTexture));
+        levelButton1.setPosition(300, -10);
+        levelButton1.setSize(buttonWidth, buttonHeight);
+        levelButton1.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                System.out.println("Chuckbird level selected");
-                // Add code to proceed to the selected level here
-                // e.g., game.setScreen(new GameScreen(game, selectedLevel));
+                System.out.println("Level 1 selected");
+                game.setScreen(new Level_1_pigs(game)); // Redirect to Level_1
+            }
+
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                // Increase the size of levelButton1
+                levelButton1.setSize(buttonWidth + 15, buttonHeight + 15); // Increase size by 15 pixels
+                levelButton1.setPosition(levelButton1.getX() - 7.5f, levelButton1.getY() - 7.5f); // Center the button
+            }
+
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                // Reset the size of levelButton1
+                levelButton1.setSize(buttonWidth, buttonHeight); // Reset size
+                levelButton1.setPosition(levelButton1.getX() + 7.5f, levelButton1.getY() + 7.5f); // Center the button back
             }
         });
 
-        // Add the button to the stage
-        stage.addActor(levelButton);
+        // Button 2: Level button 2
+        ImageButton levelButton2 = new ImageButton(new TextureRegionDrawable(level2ButtonTexture));
+        levelButton2.setPosition(400, 60);
+        levelButton2.setSize(buttonWidth, buttonHeight);
+        levelButton2.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                System.out.println("Level 2 selected");
+                // Implement redirection to Level 2
+            }
+        });
+
+        // Adjust button size for Level 3 to be 15 pixels smaller than levelButton1
+        float button3Width = buttonWidth - 15;
+        float button3Height = buttonHeight - 15;
+
+// Button 3: Level button 3
+        ImageButton levelButton3 = new ImageButton(new TextureRegionDrawable(level3ButtonTexture));
+        levelButton3.setPosition(340, 100);
+        levelButton3.setSize(button3Width, button3Height);
+        levelButton3.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                System.out.println("Level 3 selected");
+                // Implement redirection to Level 3
+            }
+        });
+
+        // Create BACK button as an ImageButton
+        final ImageButton backButton = new ImageButton(new TextureRegionDrawable(backButtonTexture));
+        backButton.setPosition(20, 20); // Bottom left position
+        backButton.setSize(115, 65); // Original size increased by 15 pixels
+        backButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                System.out.println("Back button clicked");
+                game.setScreen(new PlayAsScreen(game)); // Change to your main menu screen
+            }
+
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                backButton.setSize(backButton.getWidth() - 15, backButton.getHeight() - 15); // Reduce size by 15 pixels
+                backButton.setPosition(backButton.getX() + 7.5f, backButton.getY() + 7.5f); // Center the button
+            }
+
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                backButton.setSize(backButton.getWidth() + 15, backButton.getHeight() + 15); // Reset size back to original
+                backButton.setPosition(backButton.getX() - 7.5f, backButton.getY() - 7.5f); // Center the button back
+            }
+        });
+
+
+        // Add buttons to the stage
+        stage.addActor(levelButton1);
+        stage.addActor(levelButton2);
+        stage.addActor(levelButton3);
+        stage.addActor(backButton); // Add back button to the stage
     }
 
     @Override
@@ -80,6 +156,7 @@ public class LevelSelectionPigs implements Screen {
         spriteBatch.setProjectionMatrix(camera.combined);
 
         spriteBatch.begin();
+        // Draw background
         spriteBatch.draw(backgroundTexture, 0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
         spriteBatch.end();
 
@@ -93,14 +170,17 @@ public class LevelSelectionPigs implements Screen {
     }
 
     @Override
-    public void pause() {
-        // Code to handle pause can go here if needed
-    }
+    public void pause() {}
 
     @Override
     public void dispose() {
         backgroundTexture.dispose();
         levelButtonTexture.dispose();
+        level2ButtonTexture.dispose();
+        level3ButtonTexture.dispose();
+        lockedlevelButtonTexture.dispose();
+        chuckBirdTexture.dispose(); // Dispose of chuckbird texture
+        backButtonTexture.dispose(); // Dispose of back button texture
         spriteBatch.dispose();
         stage.dispose();
     }

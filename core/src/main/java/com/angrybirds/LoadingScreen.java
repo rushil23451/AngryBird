@@ -13,17 +13,19 @@ public class LoadingScreen implements Screen {
     private Texture bottomLeftImageTexture;
     private SpriteBatch spriteBatch;
     private float elapsedTime;
+    private boolean loadGame; // Flag to check if load game was pressed
 
-    public LoadingScreen(Main game) {
+    public LoadingScreen(Main game, boolean loadGame) {
         this.game = game;
+        this.loadGame = loadGame; // Store the button pressed information
     }
 
     @Override
     public void show() {
         // Load the "loading.png" image, background image, and bottom-left image
-        loadingImageTexture = new Texture(Gdx.files.internal("loading.png"));
+        loadingImageTexture = new Texture(Gdx.files.internal("loadingnew.png"));
         backgroundTexture = new Texture(Gdx.files.internal("wallpaperflare.com_wallpaper.jpg"));
-        bottomLeftImageTexture = new Texture(Gdx.files.internal("Screenshot_2024-10-24_093545-removebg-preview (1).png"));
+        bottomLeftImageTexture = new Texture(Gdx.files.internal("tipnew.png"));
 
         spriteBatch = new SpriteBatch();
         elapsedTime = 0f;  // Reset the timer
@@ -48,16 +50,20 @@ public class LoadingScreen implements Screen {
         // Draw the "loading.png" image in the bottom-right corner
         spriteBatch.draw(loadingImageTexture, screenWidth - loadingImageWidth, 0);  // Offset image to bottom-right corner
 
-        // Draw the bottom-left image scaled down to 50% of its original size
-        float scaledWidth = bottomLeftImageTexture.getWidth() * 0.5f;  // 50% of original width
-        float scaledHeight = bottomLeftImageTexture.getHeight() * 0.5f;  // 50% of original height
+        // Draw the bottom-left image scaled down to 40% of its original size
+        float scaledWidth = bottomLeftImageTexture.getWidth() * 1.6f;  // Adjust scaling factor to 40%
+        float scaledHeight = bottomLeftImageTexture.getHeight() * 1.6f;  // Adjust scaling factor to 40%
         spriteBatch.draw(bottomLeftImageTexture, 0, 0, scaledWidth, scaledHeight);  // Draw scaled image at (0, 0)
 
         spriteBatch.end();
 
-        // After 2 seconds, switch to the PlayAsScreen
+        // After 2 seconds, switch to the appropriate screen
         if (elapsedTime > 2.0f) {
-            game.setScreen(new PlayAsScreen(game));  // Transition to PlayAsScreen
+            if (loadGame) {
+                game.setScreen(new Level_1_birds(game));  // Transition to Level_1 if load game was pressed
+            } else {
+                game.setScreen(new PlayAsScreen(game));  // Transition to PlayAsScreen if play was pressed
+            }
         }
     }
 

@@ -1,0 +1,427 @@
+package com.angrybirds;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
+
+public class Level_1_birds implements Screen {
+    private Texture backgroundTexture;
+    private SpriteBatch spriteBatch;
+    private OrthographicCamera camera;
+    private Viewport viewport;
+    private static final float VIRTUAL_WIDTH = 800;
+    private static final float VIRTUAL_HEIGHT = 448;
+    private Main game;
+    private Stage stage;
+    private Texture pauseButtonTexture;
+    private ShapeRenderer shapeRenderer;
+    private float buttonRadius = 25f;
+    private float buttonX = 40f;
+    private float buttonY = 40f;
+
+    private RedBird redbird;
+    private slingshot slingshot;
+    private World world; // Box2D world instance
+    private WoodStructure wood1; // Dynamic wood structure
+    private WoodStructure wood3; // Dynamic wood structure
+    private WoodStructure wood4;
+    private WoodStructure wood5;
+    private WoodStructureHorizontal wood2; // Dynamic horizontal wood structure
+    private Box2DDebugRenderer debugRenderer; // For physics debugging (optional)
+
+    public Level_1_birds(Main game) {
+        this.game = game;
+    }
+
+    @Override
+    public void pause() {}
+
+    @Override
+    public void resume() {}
+
+    @Override
+    public void hide() {}
+
+    @Override
+    public void show() {
+        // Load background and initialize rendering tools
+        backgroundTexture = new Texture(Gdx.files.internal("newleveel.png"));
+        spriteBatch = new SpriteBatch();
+        camera = new OrthographicCamera();
+        viewport = new StretchViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, camera);
+        camera.position.set(VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT / 2, 0);
+        camera.update();
+
+        // Initialize Box2D world
+        world = new World(new Vector2(0, -9.8f), true);
+
+        // Debug renderer (optional, for physics visualization)
+        debugRenderer = new Box2DDebugRenderer();
+
+        float slingX = 200f / 100f; // Box2D units
+        float slingY = 100f / 100f; // Box2D units
+        float slingWidth = 50f / 100f; // Box2D units
+        float slingHeight = 150f / 100f; // Box2D units
+        slingshot = new slingshot(world, slingX, slingY, slingWidth, slingHeight);
+
+        // Initialize bird on top of the slingshot
+        float birdX = slingX; // Align horizontally with slingshot
+        float birdY = slingY + slingHeight; // Position on top of slingshot
+        float birdRadius = 25f / 100f; // Box2D radius for circular bird
+        redbird = new RedBird(world, birdX, birdY, birdRadius);
+
+        // Create the static rectangle at the bottom of the screen
+        float staticWidth = 800f / 100f;  // Convert pixels to Box2D units
+        float staticHeight = 100f / 100f; // Convert pixels to Box2D units
+        float staticX = 600f / 100f; // Center horizontally
+        float staticY = staticHeight / 2; // Position at the bottom (half height above 0)
+
+        createStaticRectangle(staticX, staticY, staticWidth, staticHeight);
+
+        // Create the dynamic wood structure above the static rectangle
+        float woodWidth = 25f / 100f; // Convert pixels to Box2D units
+        float woodHeight = 100f / 100f; // Convert pixels to Box2D units
+        float woodX = 590f/100f; // Center horizontally on top of the static rectangle
+        float woodY = 200f / 100f;
+
+        wood1 = new WoodStructure(world, woodX, woodY, woodWidth, woodHeight, true); // Dynamic type
+
+
+        // Create the dynamic wood structure above the static rectangle
+        float wood3Width = 25f / 100f; // Convert pixels to Box2D units
+        float wood3Height = 100f / 100f; // Convert pixels to Box2D units
+        float wood3X = 650f/100f; // Center horizontally on top of the static rectangle
+        float wood3Y = 200f / 100f;
+
+        wood3 = new WoodStructure(world, wood3X, wood3Y, wood3Width, wood3Height, true); // Dynamic type
+
+        // Create the second dynamic wood structure
+        float wood2Width = 100f / 100f; // Convert pixels to Box2D units
+        float wood2Height = 25f / 100f; // Convert pixels to Box2D units
+        float wood2X = 630f / 100f; // Position horizontally
+        float wood2Y = 300f / 100f; // Position vertically
+
+        wood2 = new WoodStructureHorizontal(world, wood2X, wood2Y, wood2Width, wood2Height, true); // Dynamic type
+
+
+        // Create the dynamic wood structure above the static rectangle
+        float wood4Width = 25f / 100f; // Convert pixels to Box2D units
+        float wood4Height = 100f / 100f; // Convert pixels to Box2D units
+        float wood4X = 600f/100f; // Center horizontally on top of the static rectangle
+        float wood4Y = 400f / 100f;
+
+        wood4 = new WoodStructure(world, wood4X, wood4Y, wood4Width, wood4Height, true); // Dynamic type
+
+        // Create the dynamic wood structure above the static rectangle
+        float wood5Width = 25f / 100f; // Convert pixels to Box2D units
+        float wood5Height = 100f / 100f; // Convert pixels to Box2D units
+        float wood5X = 650f/100f; // Center horizontally on top of the static rectangle
+        float wood5Y = 400f / 100f;
+
+        wood5 = new WoodStructure(world, wood5X, wood5Y, wood5Width, wood5Height, true); // Dynamic type
+        // Initialize other resources
+        stage = new Stage(viewport);
+        Gdx.input.setInputProcessor(stage);
+
+        pauseButtonTexture = new Texture(Gdx.files.internal("pausebutton.png"));
+        shapeRenderer = new ShapeRenderer();
+    }
+
+    /**
+     * Creates a static rectangle in the Box2D world.
+     */
+    private void createStaticRectangle(float x, float y, float width, float height) {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.position.set(x, y);
+        bodyDef.type = BodyDef.BodyType.StaticBody; // Static type
+        Body body = world.createBody(bodyDef);
+
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(width , height); // Set as a rectangle (half dimensions)
+
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+        fixtureDef.friction = 1f;
+
+        body.createFixture(fixtureDef);
+        shape.dispose();
+    }
+
+    @Override
+    public void render(float delta) {
+        ScreenUtils.clear(Color.BLACK);
+
+        // Step the Box2D world
+        world.step(1 / 60f, 6, 2);
+
+        // Update and render objects
+        camera.update();
+        spriteBatch.setProjectionMatrix(camera.combined);
+        spriteBatch.begin();
+
+        // Draw background
+        spriteBatch.draw(backgroundTexture, 0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
+
+        // Draw background
+        spriteBatch.draw(backgroundTexture, 0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
+
+        // Draw wood1 structure at the specified pixel coordinates
+        Vector2 wood1Position = wood1.getPosition(); // Box2D coordinates
+        spriteBatch.draw(
+            wood1.getTexture(),
+            wood1Position.x * 100 - (wood1.getWidth() * 50), // Convert to pixels and center
+            wood1Position.y * 100 - (wood1.getHeight() * 50), // Convert to pixels and center
+            wood1.getWidth() * 100, // Convert width to pixels
+            wood1.getHeight() * 100 // Convert height to pixels
+        );
+
+        // Draw wood2 structure at the specified pixel coordinates
+        Vector2 wood2Position = wood2.getPosition(); // Box2D coordinates
+        spriteBatch.draw(
+            wood2.getTexture(),
+            wood2Position.x * 100 - (wood2.getWidth() * 50), // Convert to pixels and center
+            wood2Position.y * 100 - (wood2.getHeight() * 50), // Convert to pixels and center
+            wood2.getWidth() * 100, // Convert width to pixels
+            wood2.getHeight() * 100 // Convert height to pixels
+        );
+        Vector2 wood3Position = wood3.getPosition(); // Box2D coordinates
+        spriteBatch.draw(
+            wood3.getTexture(),
+            wood3Position.x * 100 - (wood3.getWidth() * 50), // Convert to pixels and center
+            wood3Position.y * 100 - (wood3.getHeight() * 50), // Convert to pixels and center
+            wood3.getWidth() * 100, // Convert width to pixels
+            wood3.getHeight() * 100 // Convert height to pixels
+        );
+        Vector2 wood4Position = wood4.getPosition(); // Box2D coordinates
+        spriteBatch.draw(
+            wood4.getTexture(),
+            wood4Position.x * 100 - (wood4.getWidth() * 50), // Convert to pixels and center
+            wood4Position.y * 100 - (wood4.getHeight() * 50), // Convert to pixels and center
+            wood4.getWidth() * 100, // Convert width to pixels
+            wood4.getHeight() * 100 // Convert height to pixels
+        );
+        Vector2 wood5Position = wood5.getPosition(); // Box2D coordinates
+        spriteBatch.draw(
+            wood5.getTexture(),
+            wood5Position.x * 100 - (wood5.getWidth() * 50), // Convert to pixels and center
+            wood5Position.y * 100 - (wood5.getHeight() * 50), // Convert to pixels and center
+            wood5.getWidth() * 100, // Convert width to pixels
+            wood5.getHeight() * 100 // Convert height to pixels
+        );
+
+        // Draw slingshot
+        Vector2 slingPosition = slingshot.getPosition();
+        spriteBatch.draw(
+            slingshot.getTexture(),
+            slingPosition.x * 100 - (slingshot.getWidth() * 50),
+            slingPosition.y * 100 - (slingshot.getHeight() * 50),
+            slingshot.getWidth() * 100,
+            slingshot.getHeight() * 100
+        );
+
+        // Draw red bird
+        Vector2 birdPosition = redbird.getPosition();
+        spriteBatch.draw(
+            redbird.getTexture(),
+            birdPosition.x * 100 - (redbird.getRadius() * 100),
+            birdPosition.y * 100 - (redbird.getRadius() * 100),
+            redbird.getRadius() * 200,
+            redbird.getRadius() * 200
+        );
+
+        spriteBatch.end();
+
+        // Render pause button
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
+        shapeRenderer.setColor(Color.BLUE);
+        shapeRenderer.circle(buttonX, buttonY, buttonRadius);
+        shapeRenderer.end();
+
+
+        handleInput();
+        drawTrajectory();
+        // Debug physics (optional)
+        debugRenderer.render(world, camera.combined);
+
+        stage.act(delta);
+        stage.draw();
+    }
+    private boolean isDragging = false;
+    private Vector2 dragStartPosition = new Vector2();
+    private Vector2 dragEndPosition = new Vector2();
+    private Vector2 dragDirection = new Vector2();
+
+    // Constants for launch mechanics
+    private static final float MAX_DRAG_DISTANCE = 3f; // Maximum drag distance in Box2D units
+    private static final float MIN_DRAG_DISTANCE = 0.5f; // Minimum drag distance to launch
+    private static final float LAUNCH_MULTIPLIER = 5f;
+    private static final float GRAVITY = -9.8f;
+    private static final float TRAJECTORY_TIME = 2f; // How far ahead to predict trajectory
+    private static final float TRAJECTORY_STEP = 0.1f; // Time step between trajectory points
+
+    private Array<Vector2> trajectoryPoints = new Array<>();
+    private RedBird bird; // Your bird class
+
+
+    public void update() {
+        handleInput();
+        if (isDragging) {
+            updateTrajectory();
+        }
+    }
+
+    public void render() {
+        if (isDragging) {
+            drawTrajectory();
+            drawDragLine();
+        }
+    }
+
+    private static final float BIRD_RADIUS = 0.5f; // Define a radius for the bird's hitbox
+
+    private void handleInput() {
+        if (Gdx.input.isTouched()) {
+            Vector2 touchPosition = new Vector2(
+                Gdx.input.getX() * (VIRTUAL_WIDTH / Gdx.graphics.getWidth()),
+                VIRTUAL_HEIGHT - Gdx.input.getY() * (VIRTUAL_HEIGHT / Gdx.graphics.getHeight())
+            );
+
+            if (!isDragging) {
+                // Start dragging if the touch is within the bird's radius
+                Vector2 birdPosition = redbird.getPosition().scl(100);
+                if (touchPosition.dst(birdPosition) <= redbird.getRadius() * 100) {
+                    isDragging = true;
+                    dragStartPosition.set(birdPosition);
+                }
+            } else {
+                dragEndPosition.set(touchPosition);
+                dragDirection.set(dragStartPosition).sub(dragEndPosition);
+
+                // Limit drag distance
+                if (dragDirection.len() > MAX_DRAG_DISTANCE * 100) {
+                    dragDirection.setLength(MAX_DRAG_DISTANCE * 100);
+                }
+
+                // Update trajectory
+                updateTrajectory();
+            }
+        } else if (isDragging) {
+            // Release the bird
+            isDragging = false;
+
+            if (dragDirection.len() >= MIN_DRAG_DISTANCE * 100) {
+                Vector2 launchVelocity = dragDirection.scl(LAUNCH_MULTIPLIER / 200);
+                redbird.launch(launchVelocity);
+            }
+
+            // Clear trajectory
+            trajectoryPoints.clear();
+        }
+    }
+
+
+
+
+    private void launchBird() {
+        dragDirection.set(dragStartPosition).sub(dragEndPosition);
+        float dragDistance = dragDirection.len();
+
+        // Only launch if minimum drag distance is met
+        if (dragDistance >= MIN_DRAG_DISTANCE) {
+            // Calculate launch velocity based on drag distance
+            float power = (dragDistance / MAX_DRAG_DISTANCE) * LAUNCH_MULTIPLIER;
+            Vector2 launchVelocity = dragDirection.nor().scl(power);
+
+            // Apply velocity to bird
+            bird.launch(launchVelocity);
+
+//            // Optional: Add some rotation based on launch direction
+//            float rotation = MathUtils.atan2(launchVelocity.y, launchVelocity.x) * MathUtils.radiansToDegrees;
+//            bird.setRotation(rotation);
+        }
+    }
+
+
+    private void updateTrajectory() {
+        trajectoryPoints.clear();
+
+        // Use the bird's position as the starting point for the trajectory
+        Vector2 position = new Vector2(redbird.getPosition().scl(100)); // Convert Box2D units to pixels
+        Vector2 velocity = new Vector2(dragStartPosition).sub(dragEndPosition).scl(LAUNCH_MULTIPLIER / 200); // Adjust for slower speed
+        Vector2 tempVelocity = new Vector2(velocity);
+
+        // Simulate the trajectory
+        for (float t = 0; t < TRAJECTORY_TIME; t += TRAJECTORY_STEP) {
+            trajectoryPoints.add(new Vector2(position));
+
+            // Update position and velocity using physics equations
+            position.x += tempVelocity.x * TRAJECTORY_STEP;
+            position.y += tempVelocity.y * TRAJECTORY_STEP;
+            tempVelocity.y += GRAVITY * TRAJECTORY_STEP; // Gravity affects the y-velocity
+        }
+    }
+
+
+    private void drawTrajectory() {
+        if (trajectoryPoints.size < 2) return;
+
+        // Start drawing the trajectory line
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(Color.RED); // Use red for visibility
+
+        // Draw the trajectory as a smooth line
+        for (int i = 0; i < trajectoryPoints.size - 1; i++) {
+            Vector2 point1 = trajectoryPoints.get(i);
+            Vector2 point2 = trajectoryPoints.get(i + 1);
+
+            shapeRenderer.line(
+                point1.x, point1.y, // Start of the segment
+                point2.x, point2.y  // End of the segment
+            );
+        }
+
+        shapeRenderer.end();
+    }
+
+
+    private void drawDragLine() {
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(Color.RED);
+        shapeRenderer.line(
+            dragStartPosition.x, dragStartPosition.y,
+            dragEndPosition.x, dragEndPosition.y
+        );
+        shapeRenderer.end();
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        viewport.update(width, height);
+    }
+
+    @Override
+    public void dispose() {
+        backgroundTexture.dispose();
+        wood1.dispose(); // Dispose of the wood texture
+        wood2.dispose(); // Dispose of the horizontal wood texture
+        wood3.dispose();
+        spriteBatch.dispose();
+        stage.dispose();
+        pauseButtonTexture.dispose();
+        shapeRenderer.dispose();
+        debugRenderer.dispose();
+        world.dispose(); // Dispose of the physics world
+    }
+}

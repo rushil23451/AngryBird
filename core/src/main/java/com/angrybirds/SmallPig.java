@@ -2,13 +2,14 @@ package com.angrybirds;
 
 import com.badlogic.gdx.physics.box2d.World;
 
-public class Chefpig extends Pig {
+public class SmallPig extends Pig {
     // Constructor that calls the parent constructor
-    public Chefpig(World world, float x, float y,float radius) {
-        super(world, x, y, "pig1.png",radius);
+    public SmallPig(World world, float x, float y,float radius) {
+        super(world, x, y, "pig3.png",radius);
 
         // Modify attributes specific to SmallPig
-        this.health = 50f;  // Small pigs have less health
+        this.health = 40f;
+        // Small pigs have less health
     }
 
 
@@ -19,7 +20,6 @@ public class Chefpig extends Pig {
         // Override takeDamage to add a small pig-specific behavior
         super.takeDamage(damage);
 
-
-
+        // If damaged, try to use special ability
     }
 }

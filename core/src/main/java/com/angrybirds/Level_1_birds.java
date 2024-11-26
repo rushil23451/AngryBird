@@ -68,7 +68,7 @@ public class Level_1_birds implements Screen, ContactListener {
     private static final float TRAJECTORY_STEP = 0.1f;
 
     private Array<Vector2> trajectoryPoints = new Array<>();
-    private List<Object> allWoodStructures=new ArrayList<>();;
+    private List<Structure> allWoodStructures=new ArrayList<>();;
     private List<Body> bodiesToRemove = new ArrayList<>();
     private List<Pig> pigs = new ArrayList<>();
 
@@ -191,6 +191,7 @@ public class Level_1_birds implements Screen, ContactListener {
         pigs.add(smallPig2);
         allWoodStructures.add(wood1);
         allWoodStructures.add(wood3);
+        allWoodStructures.add(wood2);
 
         allWoodStructures.add(wood4);
         allWoodStructures.add(wood5);
@@ -276,7 +277,7 @@ public class Level_1_birds implements Screen, ContactListener {
                 } else if (bird instanceof YellowBird) {
                     bird = new YellowBird(world, startX - (i * BIRD_SPACING / PPM), startY, birdRadius);
                 } else if (bird instanceof Blackbird) {
-                    bird = new Blackbird(world, startX - (i * BIRD_SPACING / PPM), startY, birdRadius+5/PPM);
+                    bird = new Blackbird(world, startX - (i * BIRD_SPACING / PPM), startY, birdRadius+5f/PPM);
                 }
                 bird.getBody().setType(BodyDef.BodyType.KinematicBody);
                 birdQueue.set(i, bird);
@@ -447,33 +448,35 @@ public class Level_1_birds implements Screen, ContactListener {
 
 
     private void drawWoodStructures() {
-        for (Object woodObj : allWoodStructures) {
-
-            WoodStructure wood = (WoodStructure) woodObj;
-            if (!wood.isMarkedForRemoval()) {
-                drawRotatedWoodStructure(spriteBatch, wood);
+        for (Structure structure : allWoodStructures) {
+            if (structure instanceof WoodStructure) {
+                WoodStructure wood = (WoodStructure) structure;
+                if (!wood.isMarkedForRemoval()) {
+                    drawRotatedWoodStructure(spriteBatch, wood);
+                }
+            } else if (structure instanceof WoodStructureHorizontal) {
+                WoodStructureHorizontal wood = (WoodStructureHorizontal) structure;
+                Vector2 wood2Pos = wood.getPosition();
+                float wood2Rotation = wood.getBody().getAngle() * MathUtils.radiansToDegrees;
+                spriteBatch.draw(
+                    wood.getTexture(),
+                    wood2Pos.x * PPM - (wood.getWidth() * PPM / 2),
+                    wood2Pos.y * PPM - (wood.getHeight() * PPM / 2),
+                    wood.getWidth() * PPM / 2,
+                    wood.getHeight() * PPM / 2,
+                    wood.getWidth() * PPM,
+                    wood.getHeight() * PPM,
+                    1, 1,
+                    wood2Rotation,
+                    0, 0,
+                    wood.getTexture().getWidth(),
+                    wood.getTexture().getHeight(),
+                    false, false
+                );
             }
-
         }
-
-        Vector2 wood2Pos = wood2.getPosition();
-        float wood2Rotation = wood2.getBody().getAngle() * MathUtils.radiansToDegrees;
-        spriteBatch.draw(
-            wood2.getTexture(),
-            wood2Pos.x * PPM - (wood2.getWidth() * PPM / 2),
-            wood2Pos.y * PPM - (wood2.getHeight() * PPM / 2),
-            wood2.getWidth() * PPM / 2,
-            wood2.getHeight() * PPM / 2,
-            wood2.getWidth() * PPM,
-            wood2.getHeight() * PPM,
-            1, 1,
-            wood2Rotation,
-            0, 0,
-            wood2.getTexture().getWidth(),
-            wood2.getTexture().getHeight(),
-            false, false
-        );
     }
+
 
     private void drawRotatedWoodStructure(SpriteBatch batch, WoodStructure wood) {
         Vector2 pos = wood.getPosition();
@@ -619,130 +622,118 @@ public class Level_1_birds implements Screen, ContactListener {
 
     // Contact listener methods
     @Override
+    public void beginContact(Contact contact) {
+        Fixture fixtureA = contact.getFixtureA();
+        Fixture fixtureB = contact.getFixtureB();
 
-        public void beginContact(Contact contact) {
-            Fixture fixtureA = contact.getFixtureA();
-            Fixture fixtureB = contact.getFixtureB();
+        // Get bodies involved in the collision
+        Body bodyA = fixtureA.getBody();
+        Body bodyB = fixtureB.getBody();
 
-            // Get bodies involved in the collision
-            Body bodyA = fixtureA.getBody();
-            Body bodyB = fixtureB.getBody();
+        // Check if the collision involves a bird and a wood structure
+        boolean isBirdPigCollision = false;
+        boolean isBirdWoodCollision = false;
+        Bird bird = null;
+        Structure woodStructure = null;
+        Pig pig = null;
 
+        if (bodyA.getUserData() instanceof Bird && bodyB.getUserData() instanceof Pig) {
+            bird = (Bird) bodyA.getUserData();
+            pig = (Pig) bodyB.getUserData();
+            isBirdPigCollision = true;
+        } else if (bodyB.getUserData() instanceof Bird && bodyA.getUserData() instanceof Pig) {
+            bird = (Bird) bodyB.getUserData();
+            pig = (Pig) bodyA.getUserData();
+            isBirdPigCollision = true;
+        }
 
-            // Check if the collision involves a bird and a wood structure
-            boolean isBirdPigCollision = false;
-            boolean isBirdWoodCollision = false;
-            Bird bird = null;
-            WoodStructure woodStructure = null;
-            Pig pig = null;
+        // Check for bird-wood structure collision (supporting both vertical and horizontal)
+        if (bodyA.getUserData() instanceof Bird && (bodyB.getUserData() instanceof WoodStructure || bodyB.getUserData() instanceof WoodStructureHorizontal)) {
+            bird = (Bird) bodyA.getUserData();
+            woodStructure = (Structure) bodyB.getUserData();
+            isBirdWoodCollision = true;
+        } else if (bodyB.getUserData() instanceof Bird && (bodyA.getUserData() instanceof WoodStructure || bodyA.getUserData() instanceof WoodStructureHorizontal)) {
+            bird = (Bird) bodyB.getUserData();
+            woodStructure = (Structure) bodyA.getUserData();
+            isBirdWoodCollision = true;
+        }
 
-            if (bodyA.getUserData() instanceof Bird && bodyB.getUserData() instanceof Pig) {
-                bird = (Bird) bodyA.getUserData();
-                pig = (Pig) bodyB.getUserData();
-                isBirdPigCollision = true;
-            } else if (bodyB.getUserData() instanceof Bird && bodyA.getUserData() instanceof Pig) {
-                bird = (Bird) bodyB.getUserData();
-                pig = (Pig) bodyA.getUserData();
-                isBirdPigCollision = true;
+        if (isBirdPigCollision && bird != null && pig != null) {
+            Vector2 birdVelocity = bird.getBody().getLinearVelocity();
+            float collisionSpeed = birdVelocity.len();
+            float birdMass = bird.getBody().getMass();
+            System.out.println("Collision Detected:");
+            System.out.println("Bird Velocity: " + collisionSpeed);
+            System.out.println("Bird Mass: " + birdMass);
+
+            // Calculate damage based on momentum
+            float damage = Math.max(10f, collisionSpeed * birdMass * 10f);
+            System.out.println("Calculated Damage: " + damage);
+            pig.takeDamage(damage);
+            System.out.println("Pig Hit! Damage: " + damage + ", Remaining Health: " + pig.getHealth());
+        }
+
+        // If it's a bird-wood collision, calculate and apply damage
+        if (isBirdWoodCollision && bird != null && woodStructure != null) {
+            // Calculate collision velocity and damage
+            Vector2 birdVelocity = bird.getBody().getLinearVelocity();
+            float collisionSpeed = birdVelocity.len();
+            float birdMass = bird.getBody().getMass();
+            System.out.println("Collision Detected:");
+            System.out.println("Bird Velocity: " + collisionSpeed);
+            System.out.println("Bird Mass: " + birdMass);
+
+            // Calculate damage based on momentum (velocity * mass)
+            float damage = Math.max(10f, collisionSpeed * birdMass * 10f);
+            System.out.println("Calculated Damage: " + damage);
+
+            // Apply damage to the wood structure
+            if (woodStructure instanceof WoodStructure) {
+                ((WoodStructure) woodStructure).takeDamage(damage);
+            } else if (woodStructure instanceof WoodStructureHorizontal) {
+                ((WoodStructureHorizontal) woodStructure).takeDamage(damage);
             }
 
-
-        if (bodyA.getUserData() instanceof Bird && bodyB.getUserData() instanceof WoodStructure) {
-                bird = (Bird) bodyA.getUserData();
-                woodStructure = (WoodStructure) bodyB.getUserData();
-                isBirdWoodCollision = true;
-            } else if (bodyB.getUserData() instanceof Bird && bodyA.getUserData() instanceof WoodStructure) {
-                bird = (Bird) bodyB.getUserData();
-                woodStructure = (WoodStructure) bodyA.getUserData();
-                isBirdWoodCollision = true;
-            }
-            if (isBirdPigCollision && bird != null && pig != null) {
-                Vector2 birdVelocity = bird.getBody().getLinearVelocity();
-                float collisionSpeed = birdVelocity.len();
-                float birdMass = bird.getBody().getMass();
-                System.out.println("Collision Detected:");
-                System.out.println("Bird Velocity: " + collisionSpeed);
-                System.out.println("Bird Mass: " + birdMass);
-
-                // Calculate damage based on momentum
-                float damage = Math.max(10f, collisionSpeed * birdMass * 10f);
-                System.out.println("Calculated Damage: " + damage);
-                pig.takeDamage(damage);
-                System.out.println("Pig Hit! Damage: " + damage + ", Remaining Health: " + pig.getHealth());
-            }
-
-            // If it's a bird-wood collision, calculate and apply damage
-            if (isBirdWoodCollision && bird != null && woodStructure != null) {
-                // Calculate collision velocity and damage
-                Vector2 birdVelocity = bird.getBody().getLinearVelocity();
-                float collisionSpeed = birdVelocity.len();
-                float birdMass = bird.getBody().getMass();
-                System.out.println("Collision Detected:");
-                System.out.println("Bird Velocity: " + collisionSpeed);
-                System.out.println("Bird Mass: " + birdMass);
-
-                // Calculate damage based on momentum (velocity * mass)
-                // Adjust these multipliers based on game balance
-                float damage = Math.max(10f, collisionSpeed * birdMass * 10f);
-                System.out.println("Calculated Damage: " + damage);
-
-
-                // Apply damage to the wood structure
-                woodStructure.takeDamage(damage);
-
-                // Optional: Add a visual or sound effect for collision
-                // You might want to add methods in WoodStructure class for this
-                if (woodStructure.getCurrentHealth() <= 0) {
-                    System.out.println("Wood Structure Marked for Destruction!");
-                }
+            // Optional: Add a visual or sound effect for collision
+            if (woodStructure.getCurrentHealth() <= 0) {
+                System.out.println("Wood Structure Marked for Destruction!");
             }
         }
-//    private void destroyWoodStructure(WoodStructure woodStructure) {
-//        // Remove from physics world
-//        if (woodStructure.getBody() != null) {
-//            world.destroyBody(woodStructure.getBody());
-//        }
-//
-//        // Remove from game objects list if you're maintaining one
-//        if (allWoodStructures != null) {
-//            allWoodStructures.remove(woodStructure);
-//        }
-//
-//
-//    }
+    }
 
     private void updateWorld() {
-        List<Object> structuresToRemove = new ArrayList<>();
-        List<Pig> removepig=new ArrayList();
+        List<Structure> structuresToRemove = new ArrayList<>();
+        List<Pig> pigsToRemove = new ArrayList<>();
 
-        for (Object woodObj : allWoodStructures) {
-
-                WoodStructure structure = (WoodStructure) woodObj;
-                if (structure.isMarkedForRemoval()) {
-                    world.destroyBody(structure.getBody());
-                    structure.dispose();
-                    structuresToRemove.add(structure);
-                }
-            }
-
-        allWoodStructures.removeAll(structuresToRemove);
-        for(Pig pig:removepig){
-            Pig rem_pig = (Pig) pig;
-            if (!rem_pig.isAlive()) {
-                world.destroyBody(rem_pig.getPigBody());
-                rem_pig.dispose();
-                removepig.add(rem_pig);
+        // Remove destroyed wood structures
+        for (Structure structure : allWoodStructures) {
+            if (structure.isMarkedForRemoval()) {
+                world.destroyBody(
+                    structure instanceof WoodStructure ?
+                        ((WoodStructure) structure).getBody() :
+                        ((WoodStructureHorizontal) structure).getBody()
+                );
+                structure.dispose();
+                structuresToRemove.add(structure);
             }
         }
-        pigs.removeAll(removepig);
 
+        // Remove destroyed pigs
+        for (Pig pig : pigs) {
+            if (!pig.isAlive()) {
+                world.destroyBody(pig.getPigBody());
+                pig.dispose();
+                pigsToRemove.add(pig);
+            }
+        }
 
-
+        // Remove structures and pigs
+        allWoodStructures.removeAll(structuresToRemove);
+        pigs.removeAll(pigsToRemove);
 
         // Step the physics world
         world.step(Gdx.graphics.getDeltaTime(), 6, 2);
     }
-
 
     @Override
     public void endContact(Contact contact) {

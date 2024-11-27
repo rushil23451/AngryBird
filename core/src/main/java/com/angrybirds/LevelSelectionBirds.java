@@ -90,26 +90,53 @@ public class LevelSelectionBirds implements Screen {
         });
 
 
-        ImageButton levelButton2 = new ImageButton(new TextureRegionDrawable(level2ButtonTexture));
+        ImageButton levelButton2 = new ImageButton(new TextureRegionDrawable(levelButtonTexture));
         levelButton2.setPosition(510, 80);
         levelButton2.setSize(buttonWidth, buttonHeight);
         levelButton2.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 System.out.println("Level 2 selected");
+                game.setScreen(new Level_2_Birds(game));
+            }
 
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+
+                levelButton2.setSize(buttonWidth + 15, buttonHeight + 15); // Increase size by 15 pixels
+                levelButton2.setPosition(levelButton2.getX() - 7.5f, levelButton2.getY() - 7.5f); // Center the button
+            }
+
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+
+                levelButton2.setSize(buttonWidth, buttonHeight); // Reset size
+                levelButton2.setPosition(levelButton2.getX() + 7.5f, levelButton2.getY() + 7.5f); // Center the button back
             }
         });
 
-        // Button 3: Level button 3
-        ImageButton levelButton3 = new ImageButton(new TextureRegionDrawable(level3ButtonTexture));
+        ImageButton levelButton3 = new ImageButton(new TextureRegionDrawable(levelButtonTexture));
         levelButton3.setPosition(340, 190);
         levelButton3.setSize(buttonWidth, buttonHeight);
         levelButton3.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 System.out.println("Level 3 selected");
+                game.setScreen(new Level_3_birds(game));
+            }
 
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+
+                levelButton3.setSize(buttonWidth + 15, buttonHeight + 15); // Increase size by 15 pixels
+                levelButton3.setPosition(levelButton3.getX() - 7.5f, levelButton3.getY() - 7.5f); // Center the button
+            }
+
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+
+                levelButton3.setSize(buttonWidth, buttonHeight); // Reset size
+                levelButton3.setPosition(levelButton3.getX() + 7.5f, levelButton3.getY() + 7.5f); // Center the button back
             }
         });
 

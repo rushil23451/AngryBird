@@ -65,14 +65,14 @@ public class Level_1_pigs implements Screen {
         camera.position.set(VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT / 2, 0);
         camera.update();
 //
-//        world = new World(new Vector2(0, -9.8f), true);
-//        bird1 = new RedBird(world, 6f,1.91f,3);
-//        bird2= new YellowBird(world,6.75f,1.93f);
-//        pig1= new Chainsawpig(world,1.85f,1.45f);
-//        pig2= new MissilePig(world,1.15f,1.45f);
-//        wood1= new Haystack(world,4.8f,0.85f,1.1f,1.1f);
-//        wood2= new WoodStructureHorizontal(world,5.3f,1.6f,2.2f,0.17f);
-//        wood3= new Haystack(world,6.95f,1.05f,0.8f,0.8f);
+        world = new World(new Vector2(0, -9.8f), true);
+        bird1 = new RedBird(world, 6f,1.91f,3);
+        bird2= new YellowBird(world,6.75f,1.93f,10f);
+        pig1= new Chainsawpig(world,1.85f,1.45f);
+        pig2= new MissilePig(world,1.15f,1.45f,10f);
+        wood1= new Haystack(world,4.8f,0.85f,1.1f,1.1f);
+        wood2= new WoodStructureHorizontal(world,5.3f,1.6f,2.2f,0.17f,false);
+        wood3= new Haystack(world,6.95f,1.05f,0.8f,0.8f);
 
 
 
@@ -117,25 +117,25 @@ public class Level_1_pigs implements Screen {
 
         spriteBatch.draw(backgroundTexture, 0, 0, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
 
-//        Vector2 RedbirdPosition = bird1.getPosition();
-//        Vector2 YellowbirdPosition = bird2.getPosition();
-//
-//        Vector2 ChainsawpigPosition = pig1.getPosition();
-//        Vector2 MissilepigPosition = pig2.getPosition();
-//
-//        Vector2 wood1Position = wood1.getPosition();
-//
-//        Vector2 wood2Position = wood2.getPosition();
-//        Vector2 wood3Position = wood3.getPosition();
-//
-//        spriteBatch.draw(bird1.getTexture(), RedbirdPosition.x * 100 - 25, RedbirdPosition.y * 100 - 25, 50, 50);
-//        spriteBatch.draw(bird2.getTexture(), YellowbirdPosition.x * 100 - 25, YellowbirdPosition.y * 100 - 25, 50, 50);
-//        spriteBatch.draw(wood1.getTexture(), wood1Position.x * 100 - (wood1.getWidth() / 2), wood1Position.y * 100 - (wood1.getHeight() / 2), wood1.getWidth() * 100, wood1.getHeight() * 100);
-//        spriteBatch.draw(wood2.getTexture(), wood2Position.x * 100 - (wood2.getWidth() / 2), wood2Position.y * 100 - (wood2.getHeight() / 2), wood2.getWidth() * 100, wood2.getHeight() * 100);
-//        spriteBatch.draw(wood3.getTexture(), wood3Position.x * 100 - (wood3.getWidth() / 2), wood3Position.y * 100 - (wood3.getHeight() / 2), wood3.getWidth() * 100, wood3.getHeight() * 100);
+        Vector2 RedbirdPosition = bird1.getPosition();
+        Vector2 YellowbirdPosition = bird2.getPosition();
 
-//        spriteBatch.draw(pig1.getTexture(), ChainsawpigPosition.x * 100 - (25*1.5f), ChainsawpigPosition.y * 100 - (25*1.5f), 50*1.5f, 50*1.5f);
-//        spriteBatch.draw(pig2.getTexture(), MissilepigPosition.x * 100 - (25*1.5f), MissilepigPosition.y * 100 - (25*1.5f), 50*1.5f, 50*1.5f);
+        Vector2 ChainsawpigPosition = pig1.getPosition();
+        Vector2 MissilepigPosition = pig2.getPosition();
+
+        Vector2 wood1Position = wood1.getPosition();
+
+        Vector2 wood2Position = wood2.getPosition();
+        Vector2 wood3Position = wood3.getPosition();
+
+        spriteBatch.draw(bird1.getTexture(), RedbirdPosition.x * 100 - 25, RedbirdPosition.y * 100 - 25, 50, 50);
+        spriteBatch.draw(bird2.getTexture(), YellowbirdPosition.x * 100 - 25, YellowbirdPosition.y * 100 - 25, 50, 50);
+        spriteBatch.draw(wood1.getTexture(), wood1Position.x * 100 - (wood1.getWidth() / 2), wood1Position.y * 100 - (wood1.getHeight() / 2), wood1.getWidth() * 100, wood1.getHeight() * 100);
+        spriteBatch.draw(wood2.getTexture(), wood2Position.x * 100 - (wood2.getWidth() / 2), wood2Position.y * 100 - (wood2.getHeight() / 2), wood2.getWidth() * 100, wood2.getHeight() * 100);
+        spriteBatch.draw(wood3.getTexture(), wood3Position.x * 100 - (wood3.getWidth() / 2), wood3Position.y * 100 - (wood3.getHeight() / 2), wood3.getWidth() * 100, wood3.getHeight() * 100);
+
+        spriteBatch.draw(pig1.getTexture(), ChainsawpigPosition.x * 100 - (25*1.5f), ChainsawpigPosition.y * 100 - (25*1.5f), 50*1.5f, 50*1.5f);
+        spriteBatch.draw(pig2.getTexture(), MissilepigPosition.x * 100 - (25*1.5f), MissilepigPosition.y * 100 - (25*1.5f), 50*1.5f, 50*1.5f);
 
 
 
@@ -154,13 +154,13 @@ public class Level_1_pigs implements Screen {
     @Override
     public void dispose() {
         backgroundTexture.dispose();
-//        bird1.dispose();
-//        bird2.dispose();
-//        pig1.dispose();
-//        pig2.dispose();
-//        wood1.dispose();
-//        wood2.dispose();
-//        wood3.dispose();
+        bird1.dispose();
+        bird2.dispose();
+        pig1.dispose();
+        pig2.dispose();
+        wood1.dispose();
+        wood2.dispose();
+        wood3.dispose();
         spriteBatch.dispose();
         stage.dispose();
         pauseButtonTexture.dispose();

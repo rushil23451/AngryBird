@@ -146,6 +146,17 @@ public abstract class Structure {
         normalTexture.dispose();
         damagedTexture.dispose();
 
+
+    }
+    public void takeDamage(float damage) {
+        currentHealth -= damage;
+
+        if (currentHealth <= maxHealth * 0.6f && currentHealth>0) {
+            normalTexture = damagedTexture;
+        }
+        else if (currentHealth <= 0) {
+            this.markedForRemoval = true;
+        }
     }
 }
 

@@ -17,11 +17,11 @@ public class WoodStructure extends Structure {
             width,
             height,
             isDynamic,
-            "wood.png",         // Normal texture
+            "wood (1).png",         // Normal texture
             "wood_damaged.png", // Damaged texture
-            50f                 // Health
+            90f                 // Health
         );
-        this.density = 10f;
+        this.density = 8f;
         this.friction = 50f;
         this.restitution = 0f;
 

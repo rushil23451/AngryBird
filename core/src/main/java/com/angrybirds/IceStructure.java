@@ -1,8 +1,8 @@
 package com.angrybirds;
 
 import com.badlogic.gdx.physics.box2d.World;
-public class WoodStructureHorizontal extends Structure {
-    public WoodStructureHorizontal(
+public class IceStructure extends Structure {
+    public IceStructure(
         World world,
         float x,
         float y,
@@ -17,11 +17,11 @@ public class WoodStructureHorizontal extends Structure {
             width,
             height,
             isDynamic,
-            "woodhor (1).png",         // Normal texture
-            "woodhor_damaged.png", // Damaged texture
-            90f                 // Health
+            "glassblocklon.png",         // Normal texture
+            "dmaagedglassblocklong.jpg", // Damaged texture
+            50f                 // Health
         );
-        this.density = 8f;
+        this.density = 4f;
         this.friction = 50f;
         this.restitution = 0f;
 
@@ -35,7 +35,7 @@ public class WoodStructureHorizontal extends Structure {
     public void takeDamage(float damage) {
         currentHealth -= damage;
 
-        if (currentHealth <= maxHealth * 0.6f && currentHealth>0) {
+        if (currentHealth <= maxHealth * 0.5f && currentHealth>0) {
             normalTexture = damagedTexture;
         }
         else if (currentHealth <= 0) {

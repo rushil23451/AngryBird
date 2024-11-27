@@ -116,7 +116,6 @@ public class FirstScreen implements Screen {
             }
         });
 
-        // Exit button with hover effect
         ImageButton exitButton = new ImageButton(new TextureRegionDrawable(exitButtonTexture));
         exitButton.setSize(playButton.getWidth() * 0.8f, playButton.getHeight() * 0.8f);
         exitButton.setPosition(VIRTUAL_WIDTH / 2 - exitButton.getWidth() / 2 - 10, loadGameButton.getY() - exitButton.getHeight() - 10);

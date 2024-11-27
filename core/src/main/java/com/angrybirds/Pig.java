@@ -15,10 +15,11 @@ public abstract class Pig {
     protected Body pigBody;
     protected CircleShape pigShape;
     protected float health;
+    protected float maxHealth;  // Added to track maximum health
     protected boolean isAlive;
 
     // Constructor with default implementation
-    public Pig(World world, float x, float y, String texturePath,float radius) {
+    public Pig(World world, float x, float y, String texturePath, float radius) {
         // Initialize texture
         pigTexture = new Texture(Gdx.files.internal(texturePath));
 
@@ -35,17 +36,19 @@ public abstract class Pig {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.density = 3f;
         fixtureDef.shape = pigShape;
-        fixtureDef.friction = 5f;
-        fixtureDef.restitution = 0.1f;
+        fixtureDef.friction = 100f;
+        fixtureDef.restitution = 0f;
 
         // Create body and fixture
         pigBody = world.createBody(pigBodyDef);
         pigBody.createFixture(fixtureDef);
+        pigBody.setUserData(this);  // Set the user data to this pig instance
 
         pigShape.dispose();
 
         // Initialize default health and alive status
-        this.health = 60f;
+        this.maxHealth = 60f;
+        this.health = this.maxHealth;
         this.isAlive = true;
     }
 
@@ -61,11 +64,14 @@ public abstract class Pig {
         return pigBody;
     }
 
+    public Body getBody() {  // Added alias method for consistency
+        return pigBody;
+    }
+
     public void setPigBody(Body pigBody) {
         this.pigBody = pigBody;
     }
 
-    // Common methods that can be overridden by child classes
     public Vector2 getPosition() {
         return pigBody.getPosition();
     }
@@ -74,8 +80,17 @@ public abstract class Pig {
         return health;
     }
 
+    public float getCurrentHealth() {  // Added method for current health
+        return health;
+    }
+
+    public float getMaxHealth() {  // Added method for maximum health
+        return maxHealth;
+    }
+
     public void setHealth(float health) {
-        this.health = health;
+        this.health = Math.max(0, Math.min(health, maxHealth));  // Clamp health between 0 and maxHealth
+        this.isAlive = this.health > 0;
     }
 
     public Texture getTexture() {
@@ -83,19 +98,25 @@ public abstract class Pig {
     }
 
     public void takeDamage(float damage) {
-        this.health -= damage;
-        if (this.health <= 0) {
-            this.isAlive = false;
-        }
+        if (!isAlive) return;  // Don't process damage if already dead
+
+        float newHealth = Math.max(0, this.health - damage);
+        setHealth(newHealth);
+
+        // Debug output for damage taken
+        System.out.println("Pig took " + damage + " damage. Health: " + getCurrentHealth() + "/" + getMaxHealth());
     }
 
     public boolean isAlive() {
         return this.isAlive;
     }
-
-    // Abstract method to be implemented by child classes
-
-
+    public void setTexture(Texture newTexture) {
+        // Dispose of the old texture to prevent memory leaks
+        if (this.pigTexture != null) {
+            this.pigTexture.dispose();
+        }
+        this.pigTexture = newTexture;
+    }
     // Cleanup method
     public void dispose() {
         if (pigTexture != null) {

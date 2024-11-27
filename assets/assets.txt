@@ -26,19 +26,42 @@ bird3.png
 birdbackground.png
 birdslevel.png
 birdsselectionlevel.jpg
+Bomb.png
 chuckbird.png
 chuckfinal.png
 chuckhover.png
+cliffnewe.png
+cliff_enhanced.png
+damagedicesquareblock.png
+damagedminionpig.png
+damagedstonblock.png
+damagedstonelonglog.png
+damagedstonesquareblock.png
+damagedstonesquarelgo.png
 desktop-wallpaper-angry-birds-game-angry-birds.jpg
+dmaagedglassblocklong.jpg
 EXIT_FINAL_BUTTON-removebg-preview.png
+forwardbutton.png
+glassblocklon.png
 haystack.png
+helmetpig.png
+helmetpigdamaged.png
 HOMESCREEN (1).png
 HOMESCREEN (2).png
 HOMESCREEN.jpg
 HOMESCREEN.png
+icedamagedlonglog.png
+icedamagedsquarelog.png
+icelonglog.png
+icesquareblock.png
+icesquarelog.png
 image-removebg-preview.png
 image.png
+img.png
 imresizer-1729495518724.jpg
+King_Failled.png
+King_pig_little_corpse.png
+level.webp
 levelbutton.png
 levelfnial.png
 levelhoevrinfla.png
@@ -48,6 +71,9 @@ loading.png
 loadingnew.png
 loadingnew2.png
 losescreenpigs.webp
+minionpig.png
+newleveel.png
+newpigleevle.webp
 pausebutton.png
 pig-happy-angry-birds-28211886-1920-1200.jpg
 pig1.png
@@ -71,6 +97,10 @@ slingshot.png
 slypig.png
 slypigfinal.png
 slypighover.png
+stonelongblock.png
+stonelonglog.png
+stonesquareblock.png
+stonesquarelog.png
 tipnew.png
 ui/font-list.fnt
 ui/font-subtitle.fnt
@@ -88,6 +118,10 @@ vctory.png
 victory screen.jpg
 wallpaperflare.com_wallpaper.jpg
 wallpaperpig.jpg
+wood (1).png
 wood.png
+woodhor (1).png
 woodhor.png
+woodhor_damaged.png
+wood_damaged.png
 wp3830719-angry-bird-red-wallpapers.jpg

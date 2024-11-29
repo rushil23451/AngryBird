@@ -2,6 +2,7 @@ package com.angrybirds;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -27,10 +28,13 @@ public class FirstScreen implements Screen {
     private Main game;
     private Stage stage;
     private Sound buttonClickSound;
+    private Music backgroundMusic;
+    private boolean isMusicPlaying = true;
 
     private Texture playButtonTexture;
     private Texture exitButtonTexture;
     private Texture loadButtonTexture;
+
 
     public FirstScreen(Main game) {
         this.game = game;
@@ -43,11 +47,16 @@ public class FirstScreen implements Screen {
     public void resume() {}
 
     @Override
-    public void hide() {}
+    public void hide() {
+        // Stop music when screen is hidden
+        if (backgroundMusic != null) {
+            backgroundMusic.stop();
+        }
+    }
 
     @Override
     public void show() {
-        backgroundTexture = new Texture(Gdx.files.internal("Untitled design.png"));
+        backgroundTexture = new Texture(Gdx.files.internal("firstscreen.png"));
         spriteBatch = new SpriteBatch();
         camera = new OrthographicCamera();
         viewport = new StretchViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, camera);
@@ -57,20 +66,34 @@ public class FirstScreen implements Screen {
         stage = new Stage(viewport);
         Gdx.input.setInputProcessor(stage);
 
-        buttonClickSound = Gdx.audio.newSound(Gdx.files.internal("289721-Select-heavy-complex-hi-tech-tone-04.mp3"));
+        // Load background music (you'll replace this path with your random music path)
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("main_theme.mp3"));
+        backgroundMusic.setLooping(true);
+        backgroundMusic.play();
+
+        buttonClickSound = Gdx.audio.newSound(Gdx.files.internal("Buttonclicksound.mp3"));
 
         playButtonTexture = new Texture(Gdx.files.internal("Play_final_button-removebg-preview.png"));
         exitButtonTexture = new Texture(Gdx.files.internal("EXIT_FINAL_BUTTON-removebg-preview.png"));
         loadButtonTexture = new Texture(Gdx.files.internal("LOAD-SAVED-removebg-preview (1).png"));
 
+
+        // Increased button size (20% larger)
+        float buttonSizeMultiplier = 1.2f;
+
         // Set up Play button with hover effect
         ImageButton playButton = new ImageButton(new TextureRegionDrawable(playButtonTexture));
+        playButton.setSize(playButton.getWidth() * buttonSizeMultiplier, playButton.getHeight() * buttonSizeMultiplier);
         playButton.setPosition(VIRTUAL_WIDTH / 2 - playButton.getWidth() / 2, VIRTUAL_HEIGHT / 2 + playButton.getHeight() - 200);
 
         playButton.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 buttonClickSound.play();
+                // Stop music when changing screen
+                if (backgroundMusic != null) {
+                    backgroundMusic.stop();
+                }
                 System.out.println("PLAY button clicked");
                 game.setScreen(new LoadingScreen(game, false));
                 return true;
@@ -78,46 +101,56 @@ public class FirstScreen implements Screen {
 
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                playButton.setSize(playButton.getWidth() + 10, playButton.getHeight() + 20); // Increase size
-                playButton.setPosition(playButton.getX() - 5, playButton.getY() - 5); // Adjust position
+                playButton.setSize(playButton.getWidth() + 10, playButton.getHeight() + 20);
+                playButton.setPosition(playButton.getX() - 5, playButton.getY() - 5);
             }
 
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-                playButton.setSize(playButton.getWidth() - 10, playButton.getHeight() - 20); // Reset size
-                playButton.setPosition(playButton.getX() + 5, playButton.getY() + 5); // Adjust position
+                playButton.setSize(playButton.getWidth() - 10, playButton.getHeight() - 20);
+                playButton.setPosition(playButton.getX() + 5, playButton.getY() + 5);
             }
         });
 
         // Load Game button with hover effect
         ImageButton loadGameButton = new ImageButton(new TextureRegionDrawable(loadButtonTexture));
-        loadGameButton.setSize(playButton.getWidth() * 0.8f, playButton.getHeight() * 0.8f);
+        loadGameButton.setSize(playButton.getWidth() * 0.8f * buttonSizeMultiplier, playButton.getHeight() * 0.8f * buttonSizeMultiplier);
         loadGameButton.setPosition(VIRTUAL_WIDTH / 2 - loadGameButton.getWidth() / 2 - 65, playButton.getY() - loadGameButton.getHeight() + 30);
 
         loadGameButton.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 buttonClickSound.play();
+                // Stop music when changing screen
+                if (backgroundMusic != null) {
+                    backgroundMusic.stop();
+                }
                 System.out.println("LOAD GAME button clicked");
-                game.setScreen(new LoadingScreen(game, true));
+
+                // Load the saved game data
+                SaveData savedData = SaveData.loadGame();
+
+                // Pass the current level to the LoadingScreen
+                game.setScreen(new LoadingScreen(game, true, savedData.getCurrentLevel()));
                 return true;
             }
 
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                loadGameButton.setSize(loadGameButton.getWidth() + 10, loadGameButton.getHeight() + 10); // Increase size
-                loadGameButton.setPosition(loadGameButton.getX() - 5, loadGameButton.getY() - 5); // Adjust position
+                loadGameButton.setSize(loadGameButton.getWidth() + 10, loadGameButton.getHeight() + 10);
+                loadGameButton.setPosition(loadGameButton.getX() - 5, loadGameButton.getY() - 5);
             }
 
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-                loadGameButton.setSize(loadGameButton.getWidth() - 10, loadGameButton.getHeight() - 10); // Reset size
-                loadGameButton.setPosition(loadGameButton.getX() + 5, loadGameButton.getY() + 5); // Adjust position
+                loadGameButton.setSize(loadGameButton.getWidth() - 10, loadGameButton.getHeight() - 10);
+                loadGameButton.setPosition(loadGameButton.getX() + 5, loadGameButton.getY() + 5);
             }
         });
 
+        // Exit button
         ImageButton exitButton = new ImageButton(new TextureRegionDrawable(exitButtonTexture));
-        exitButton.setSize(playButton.getWidth() * 0.8f, playButton.getHeight() * 0.8f);
+        exitButton.setSize(playButton.getWidth() * 0.8f * buttonSizeMultiplier, playButton.getHeight() * 0.8f * buttonSizeMultiplier);
         exitButton.setPosition(VIRTUAL_WIDTH / 2 - exitButton.getWidth() / 2 - 10, loadGameButton.getY() - exitButton.getHeight() - 10);
 
         exitButton.addListener(new InputListener() {
@@ -131,20 +164,34 @@ public class FirstScreen implements Screen {
 
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                exitButton.setSize(exitButton.getWidth() + 10, exitButton.getHeight() + 10); // Increase size
-                exitButton.setPosition(exitButton.getX() - 5, exitButton.getY() - 5); // Adjust position
+                exitButton.setSize(exitButton.getWidth() + 10, exitButton.getHeight() + 10);
+                exitButton.setPosition(exitButton.getX() - 5, exitButton.getY() - 5);
             }
 
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-                exitButton.setSize(exitButton.getWidth() - 10, exitButton.getHeight() - 10); // Reset size
-                exitButton.setPosition(exitButton.getX() + 5, exitButton.getY() + 5); // Adjust position
+                exitButton.setSize(exitButton.getWidth() - 10, exitButton.getHeight() - 10);
+                exitButton.setPosition(exitButton.getX() + 5, exitButton.getY() + 5);
             }
         });
+
 
         stage.addActor(playButton);
         stage.addActor(loadGameButton);
         stage.addActor(exitButton);
+
+    }
+
+    private void toggleMusic() {
+        if (backgroundMusic != null) {
+            if (isMusicPlaying) {
+                backgroundMusic.pause();
+                isMusicPlaying = false;
+            } else {
+                backgroundMusic.play();
+                isMusicPlaying = true;
+            }
+        }
     }
 
     @Override
@@ -171,8 +218,14 @@ public class FirstScreen implements Screen {
         playButtonTexture.dispose();
         exitButtonTexture.dispose();
         loadButtonTexture.dispose();
+
         spriteBatch.dispose();
         stage.dispose();
         buttonClickSound.dispose();
+
+        // Dispose of music
+        if (backgroundMusic != null) {
+            backgroundMusic.dispose();
+        }
     }
 }

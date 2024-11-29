@@ -54,7 +54,11 @@ public abstract class Bird {
     public Body getBody() {
         return birdBody;
     }
-
+    public void setVelocity(float x, float y) {
+        if (birdBody != null) {
+            birdBody.setLinearVelocity(x, y);
+        }
+    }
     public boolean contains(float touchX, float touchY) {
         if (birdBody == null) {
             return false;

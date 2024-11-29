@@ -1,43 +1,54 @@
 package com.angrybirds;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.viewport.FitViewport;
-
 import java.io.Serializable;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
-// Class to represent saved game state
-class SaveData implements Serializable {
-    public int currentLevel;
-    public float playerX;
-    public float playerY;
-    public int score;
+public class SaveData implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private int currentLevel;
 
-    // You can add more fields as needed for your specific game state
-
-    public SaveData() {
-        // Default constructor
+    // Constructor
+    public SaveData(int currentLevel) {
+        this.currentLevel = currentLevel;
     }
 
-    public SaveData(int level, float x, float y, int playerScore) {
-        this.currentLevel = level;
-        this.playerX = x;
-        this.playerY = y;
-        this.score = playerScore;
+    // Getter for current level
+    public int getCurrentLevel() {
+        return currentLevel;
+    }
+
+    // Setter for current level
+    public void setCurrentLevel(int currentLevel) {
+        this.currentLevel = currentLevel;
+    }
+
+    // Method to save game data
+    public static void saveGame(SaveData data) {
+        try (FileOutputStream fileOut = new FileOutputStream("game_save.ser");
+             ObjectOutputStream out = new ObjectOutputStream(fileOut)) {
+            out.writeObject(data);
+            System.out.println("Game progress saved successfully.");
+        } catch (IOException i) {
+            System.err.println("Error saving game progress: " + i.getMessage());
+        }
+    }
+
+    // Method to load game data
+    public static SaveData loadGame() {
+        try (FileInputStream fileIn = new FileInputStream("game_save.ser");
+             ObjectInputStream in = new ObjectInputStream(fileIn)) {
+            SaveData data = (SaveData) in.readObject();
+            System.out.println("Game progress loaded successfully.");
+            return data;
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("No saved game found or error loading: " + e.getMessage());
+            // Return a default save data if no save exists
+            return new SaveData(1); // Default to first level
+        }
     }
 }
 

@@ -15,6 +15,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.utils.Timer;
+
+
 
 public class PauseScreen implements Screen {
     private Texture backgroundTexture;
@@ -29,9 +32,11 @@ public class PauseScreen implements Screen {
     private static final float VIRTUAL_HEIGHT = 448;
     private Main game;
     private Stage stage;
+    private int currentlevel;
 
-    public PauseScreen(Main game) {
+    public PauseScreen(Main game,int currentlevel) {
         this.game = game;
+        this.currentlevel=currentlevel;
     }
 
     @Override
@@ -74,7 +79,28 @@ public class PauseScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 System.out.println("RESUME button clicked");
-                game.setScreen(new Level_1_birds(game));
+                Screen nextScreen;
+                switch (currentlevel) {
+                    case 1:
+                        nextScreen = new Level_1_birds(game);
+                        break;
+                    case 2:
+                        nextScreen = new Level_2_Birds(game);
+                        break;
+                    case 3:
+                        nextScreen = new Level_3_birds(game);
+                        break;
+                    default:
+                        nextScreen = new Level_1_birds(game);
+                        break;
+                }
+
+                Timer.schedule(new Timer.Task() {
+                    @Override
+                    public void run() {
+                        game.setScreen(nextScreen);
+                    }
+                }, 1.5f);
             }
 
             @Override
@@ -97,7 +123,7 @@ public class PauseScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 System.out.println("RETRY button clicked");
-                game.setScreen(new LoseScreen1(game));
+                game.setScreen(new LoseScreen1(game,currentlevel));
             }
 
             @Override
@@ -121,6 +147,8 @@ public class PauseScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 System.out.println("SAVE button clicked");
+                SaveData saveData = new SaveData(currentlevel);
+                SaveData.saveGame(saveData);
 
                 game.setScreen(new FirstScreen(game));
             }

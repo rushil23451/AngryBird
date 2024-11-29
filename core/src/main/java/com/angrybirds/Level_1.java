@@ -60,7 +60,7 @@ public class Level_1 implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 System.out.println("Pause button clicked");
-                game.setScreen(new PauseScreen(game));
+                game.setScreen(new PauseScreen(game,1));
             }
 
             @Override

@@ -18,6 +18,7 @@ public class LoseScreen implements Screen {
         batch = new SpriteBatch();
         backgroundTexture = new Texture(Gdx.files.internal("wp3830719-angry-bird-red-wallpapers.jpg"));
 
+        // Stop background music if it's playing
 
         Timer.schedule(new Timer.Task() {
             @Override
@@ -34,13 +35,8 @@ public class LoseScreen implements Screen {
 
     @Override
     public void render(float delta) {
-
         batch.begin();
-
-
         batch.draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
-        // End the SpriteBatch
         batch.end();
     }
 
@@ -60,7 +56,6 @@ public class LoseScreen implements Screen {
 
     @Override
     public void dispose() {
-
         batch.dispose();
         backgroundTexture.dispose();
     }

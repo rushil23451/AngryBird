@@ -22,9 +22,12 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import java.util.List;
 import java.util.ArrayList;
-import com.badlogic.gdx.math.Vector2;
+import java.util.stream.Collectors;
+
 
 public class Level_1_birds implements Screen, ContactListener {
     private Texture backgroundTexture;
@@ -78,6 +81,8 @@ public class Level_1_birds implements Screen, ContactListener {
     private List<Structure> allWoodStructures=new ArrayList<>();;
     private List<Body> bodiesToRemove = new ArrayList<>();
     private List<Pig> pigs = new ArrayList<>();
+    private Sound slingshotSound;
+    private boolean isSoundPlaying = false;
 
 
     private boolean birdLaunched = false;
@@ -85,10 +90,13 @@ public class Level_1_birds implements Screen, ContactListener {
     private static final float RESPAWN_DELAY = 2f;
     private static final float OFF_SCREEN_X = VIRTUAL_WIDTH + 100;
     private static final float OFF_SCREEN_Y = -100;
+    private Music backgroundMusic;
+    private boolean musicPaused = false;
+    private boolean musicDisposed = false;
 
     public Level_1_birds(Main game) {
         this.game = game;
-        this.score =score;
+        this.score =0;
     }
 
     @Override
@@ -108,9 +116,15 @@ public class Level_1_birds implements Screen, ContactListener {
         viewport = new StretchViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, camera);
         camera.position.set(VIRTUAL_WIDTH / 2, VIRTUAL_HEIGHT / 2, 0);
         camera.update();
+        backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("level1_sound.mp3"));
+        backgroundMusic.setLooping(true);
+        backgroundMusic.play();
+
+
 
         font = new BitmapFont();
         font.setColor(Color.WHITE);
+        slingshotSound = Gdx.audio.newSound(Gdx.files.internal("angry-birds-slingshot.mp3"));
 
         world = new World(new Vector2(0, -9.8f), true);
         world.setContactListener(this);
@@ -122,7 +136,7 @@ public class Level_1_birds implements Screen, ContactListener {
         float slingHeight = 120f / PPM;
         slingshot = new slingshot(world, slingX, slingY, slingWidth, slingHeight);
 
-        // Initialize bird queue and spawn first bird
+        // Initialize bird queue and `spawn` first bird
         birdQueue = new Array<>();
         initializeBirdQueue();
 
@@ -139,6 +153,7 @@ public class Level_1_birds implements Screen, ContactListener {
         stage = new Stage(viewport);
         Gdx.input.setInputProcessor(stage);
 
+
         pauseButtonTexture = new Texture(Gdx.files.internal("pausebutton.png"));
         shapeRenderer = new ShapeRenderer();
         pauseButtonTexture = new Texture(Gdx.files.internal("pausebutton.png"));
@@ -149,7 +164,8 @@ public class Level_1_birds implements Screen, ContactListener {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 System.out.println("Pause button clicked");
-                game.setScreen(new PauseScreen(game));
+                stopMusic();
+                game.setScreen(new PauseScreen(game,1));
             }
 
             @Override
@@ -199,24 +215,24 @@ public class Level_1_birds implements Screen, ContactListener {
         float woodWidth = 17.5f / PPM;
         float woodHeight = 75f / PPM;
 
-        float wood2Width = 100f / PPM;
+        float wood2Width = 120f / PPM;
         float wood2Height = 17.5f / PPM;
 
 
         float pigRadius = 15f / PPM;
 
         float baseY = groundLevel + (woodHeight);  // Center point of the wood pieces
-        wood1 = new WoodStructure(world, 590f / PPM, baseY, woodWidth, woodHeight, true);
-        wood3 = new WoodStructure(world, 650f / PPM, baseY, woodWidth, woodHeight, true);
+        wood1 = new WoodStructure(world, 540f / PPM, groundLevel, woodWidth, woodHeight, true);
+        wood3 = new WoodStructure(world, 630f / PPM, groundLevel, woodWidth, woodHeight, true);
 
         float horizontalY = baseY + (woodHeight) + (wood2Height);
-        wood2 = new WoodStructureHorizontal(world, 620f / PPM, horizontalY, wood2Width, wood2Height, true);
+        wood2 = new WoodStructureHorizontal(world, 580f / PPM, baseY, wood2Width, wood2Height, true);
 
-        float upperY = horizontalY + (woodHeight);
-        wood4 = new WoodStructure(world, 590f / PPM, upperY, woodWidth, woodHeight, true);
-        wood5 = new WoodStructure(world, 650f / PPM, upperY, woodWidth, woodHeight, true);
-        SmallPig smallPig1 = new SmallPig(world, 612.5f / PPM, baseY,pigRadius);
-        SmallPig smallPig2 = new SmallPig(world, 612.5f / PPM, upperY,pigRadius);
+        float upperY = baseY + (woodWidth);
+        wood4 = new WoodStructure(world, 550f / PPM, upperY, woodWidth, woodHeight, true);
+        wood5 = new WoodStructure(world, 620f / PPM, upperY, woodWidth, woodHeight, true);
+        SmallPig smallPig1 = new SmallPig(world, 590f / PPM, upperY-woodWidth/2,pigRadius);
+        SmallPig smallPig2 = new SmallPig(world, 590f / PPM, groundLevel,pigRadius);
         smallPig1.getPigBody().setUserData(smallPig1);
         smallPig2.getPigBody().setUserData(smallPig2);
         pigs.add(smallPig1);
@@ -282,11 +298,10 @@ public class Level_1_birds implements Screen, ContactListener {
             birdQueue.removeIndex(0);
 
             // Create new active bird at slingshot position
-            // We need to create the correct type of bird based on the class of nextBird
             if (nextBird instanceof RedBird) {
                 activeBird = new RedBird(world, slingX, (slingY + slingHeight)-20f/PPM, birdRadius);
             } else if (nextBird instanceof YellowBird) {
-                activeBird = new YellowBird(world, slingX,(slingY + slingHeight)-20f/PPM, birdRadius);
+                activeBird = new YellowBird(world, slingX, (slingY + slingHeight)-20f/PPM, birdRadius);
             } else if (nextBird instanceof Blackbird) {
                 activeBird = new Blackbird(world, slingX, (slingY + slingHeight)-20f/PPM, birdRadius+5f/PPM);
             }
@@ -294,16 +309,13 @@ public class Level_1_birds implements Screen, ContactListener {
             birdLaunched = false;
             isDragging = false;
 
-            // Shift remaining birds forward and update their bodies
             float startX = 100f / PPM;
             float startY = 160f / PPM;
             for (int i = 0; i < birdQueue.size; i++) {
                 Bird bird = birdQueue.get(i);
-                // Destroy old body
                 if (bird.getBody() != null) {
                     world.destroyBody(bird.getBody());
                 }
-                // Create new body at updated position
                 if (bird instanceof RedBird) {
                     bird = new RedBird(world, startX - (i * BIRD_SPACING / PPM), startY, birdRadius);
                 } else if (bird instanceof YellowBird) {
@@ -384,14 +396,8 @@ public class Level_1_birds implements Screen, ContactListener {
         if (victoryConditionMet) {
             victoryTimer += delta;
             if (victoryTimer >= VICTORY_DELAY) {
-                game.setScreen(new WinScreen(game));
-                return;
-            }
-        }
-        if (victoryConditionMet) {
-            victoryTimer += delta;
-            if (victoryTimer >= VICTORY_DELAY) {
-                game.setScreen(new WinScreen(game));
+                stopMusic();
+                game.setScreen(new WinScreen(game,1,score));
                 return;
             }
         }
@@ -457,18 +463,16 @@ public class Level_1_birds implements Screen, ContactListener {
         }
 
 
-
         // Draw drag distance
         if (isDragging) {
             float dragDistance = dragDirection.len() / PPM;
-            String dragText = String.format("Drag: %.1fm", dragDistance);
-            font.draw(spriteBatch, dragText, 10, VIRTUAL_HEIGHT - 10);
+
         }
 
         spriteBatch.end();
         checkGameState();
 
-        debugRenderer.render(world, debugMatrix);
+//        debugRenderer.render(world, debugMatrix);
 
         // Draw UI elements
         drawUIElements();
@@ -479,13 +483,31 @@ public class Level_1_birds implements Screen, ContactListener {
         stage.act(delta);
         stage.draw();
     }
+    private void stopMusic() {
+        if (backgroundMusic != null) {
+            backgroundMusic.stop();
+            backgroundMusic.dispose();
+            backgroundMusic = null;
+
+        }
+    }
     private void checkGameState() {
-        // Check if all pigs are dead
+        // Check if all pigs are dead or outside screen boundaries
         boolean allPigsDead = pigs.stream()
-            .noneMatch(pig -> pig.isAlive() &&
-                (pig.getPosition().x * PPM > 0 && pig.getPosition().x * PPM < VIRTUAL_WIDTH) &&
-                (pig.getPosition().y * PPM > 0 && pig.getPosition().y * PPM < VIRTUAL_HEIGHT)
-            );
+            .noneMatch(pig -> {
+                boolean outsideBoundaries =
+                    pig.getPosition().x * PPM < 0 ||
+                        pig.getPosition().x * PPM > VIRTUAL_WIDTH ||
+                        pig.getPosition().y * PPM < 0 ||
+                        pig.getPosition().y * PPM > VIRTUAL_HEIGHT;
+
+                if (outsideBoundaries && pig.isAlive()) {
+                    score=score+1000;
+                    pig.setAlive(false);
+                }
+
+                return pig.isAlive() && !outsideBoundaries;
+            });
 
         // Check if all birds have been used
         boolean allBirdsUsed = birdQueue.isEmpty() && activeBird == null;
@@ -493,8 +515,14 @@ public class Level_1_birds implements Screen, ContactListener {
         if (allPigsDead && !victoryConditionMet) {
             victoryConditionMet = true;
             victoryTimer = 0f;
+            stopMusic();
         } else if (allBirdsUsed && !allPigsDead) {
-            game.setScreen(new LoseScreen1(game));
+            if (backgroundMusic != null) {
+                backgroundMusic.stop();
+                backgroundMusic.dispose();
+                backgroundMusic = null;
+            }
+            game.setScreen(new LoseScreen1(game,1));
         }
     }
 
@@ -551,11 +579,7 @@ public class Level_1_birds implements Screen, ContactListener {
     }
 
     private void drawUIElements() {
-        shapeRenderer.setProjectionMatrix(camera.combined);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-        shapeRenderer.setColor(Color.BLUE);
-        shapeRenderer.circle(buttonX, buttonY, buttonRadius);
-        shapeRenderer.end();
+
 
         if (isDragging) {
             shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
@@ -580,63 +604,93 @@ public class Level_1_birds implements Screen, ContactListener {
                 if (touchPosition.dst(birdPosition) <= activeBird.getRadius() * PPM) {
                     isDragging = true;
                     dragStartPosition.set(birdPosition);
+                    // Play sound when starting to drag
+                    if (!isSoundPlaying) {
+                        slingshotSound.play(0.5f);
+                        isSoundPlaying = true;
+                    }
                 }
             } else {
                 dragEndPosition.set(touchPosition);
                 dragDirection.set(dragStartPosition).sub(dragEndPosition);
-
                 if (dragDirection.len() > MAX_DRAG_DISTANCE * PPM) {
                     dragDirection.setLength(MAX_DRAG_DISTANCE * PPM);
                     dragEndPosition.set(dragStartPosition).sub(dragDirection);
                 }
-
                 updateTrajectory();
+            }
+        } else if (Gdx.input.isTouched() && birdLaunched && activeBird != null) {
+            Vector2 touchPosition = new Vector2(
+                Gdx.input.getX() * (VIRTUAL_WIDTH / Gdx.graphics.getWidth()),
+                VIRTUAL_HEIGHT - Gdx.input.getY() * (VIRTUAL_HEIGHT / Gdx.graphics.getHeight())
+            );
+
+            // Activate special ability if click is within screen bounds
+            if (touchPosition.x >= 0 && touchPosition.x <= VIRTUAL_WIDTH &&
+                touchPosition.y >= 0 && touchPosition.y <= VIRTUAL_HEIGHT) {
+
+                if (activeBird instanceof RedBird) {
+                    Bird[] additionalBirds = ((RedBird) activeBird).specialAbility();
+                    for (Bird newBird : additionalBirds) {
+                        birdQueue.add(newBird);
+                    }
+                } else if (activeBird instanceof YellowBird) {
+                    ((YellowBird) activeBird).specialAbility();
+                } else if (activeBird instanceof Blackbird) {
+                    ((Blackbird) activeBird).specialAbility(allWoodStructures, pigs, camera);
+                }
             }
         } else if (isDragging) {
             isDragging = false;
+            isSoundPlaying = false;
 
             if (dragDirection.len() >= MIN_DRAG_DISTANCE * PPM) {
                 Vector2 launchVelocity = dragDirection.scl(LAUNCH_MULTIPLIER / 200);
                 activeBird.launch(launchVelocity);
                 birdLaunched = true;
             }
-
             trajectoryPoints.clear();
         }
     }
+
 
     private static final float DASH_SIZE = 5f;
     private static final float GAP_SIZE = 5f;
 
 
+
     private void updateTrajectory() {
         trajectoryPoints.clear();
 
-        Vector2 position = new Vector2(activeBird.getPosition().scl(PPM));
+        Vector2 initialPosition = new Vector2(activeBird.getPosition().scl(PPM));
         Vector2 velocity = new Vector2(dragStartPosition).sub(dragEndPosition).scl(LAUNCH_MULTIPLIER / 200);
-        Vector2 tempVelocity = new Vector2(velocity);
+        Vector2 gravity = new Vector2(0, GRAVITY * PPM);
 
         for (float t = 0; t < TRAJECTORY_TIME; t += TRAJECTORY_STEP) {
-            trajectoryPoints.add(new Vector2(position));
-            position.x += tempVelocity.x * TRAJECTORY_STEP;
-            position.y += tempVelocity.y * TRAJECTORY_STEP;
-            tempVelocity.y += GRAVITY * TRAJECTORY_STEP;
+            trajectoryPoints.add(new Vector2(initialPosition));
+            initialPosition.x += velocity.x * TRAJECTORY_STEP * PPM;
+            initialPosition.y += velocity.y * TRAJECTORY_STEP * PPM;
+            velocity.add(gravity.scl(TRAJECTORY_STEP));
         }
     }
 
     private void drawTrajectory() {
-        if (trajectoryPoints.size < 2) return;
+        if (trajectoryPoints.isEmpty() || !isDragging) return;
 
         shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(Color.RED);
+        shapeRenderer.setColor(Color.WHITE);
+        shapeRenderer.setProjectionMatrix(camera.combined);
 
-        for (int i = 0; i < trajectoryPoints.size - 1; i++) {
+        Gdx.gl.glLineWidth(3f);  // Increase line thickness
+
+        // Draw a dashed line for the trajectory
+        for (int i = 0; i < trajectoryPoints.size - 1; i += 2) {
             Vector2 point1 = trajectoryPoints.get(i);
-            Vector2 point2 = trajectoryPoints.get(i + 1);
+            Vector2 point2 = trajectoryPoints.get(Math.min(i + 1, trajectoryPoints.size - 1));
 
             shapeRenderer.line(
-                point1.x, point1.y,
-                point2.x, point2.y
+                point1.x / PPM, point1.y / PPM,
+                point2.x / PPM, point2.y / PPM
             );
         }
 
@@ -662,6 +716,11 @@ public class Level_1_birds implements Screen, ContactListener {
         debugRenderer.dispose();
         font.dispose();
         world.dispose();
+        slingshotSound.dispose();
+        if (backgroundMusic != null) {
+            backgroundMusic.stop();
+            backgroundMusic.dispose();
+        }
 
         // Dispose of birds
         if (activeBird != null) {
@@ -749,9 +808,6 @@ public class Level_1_birds implements Screen, ContactListener {
         System.out.println("Calculated Damage to Pig: " + damage);
 
         pig.takeDamage(damage);
-        if (!pig.isAlive()) {
-            score += 1000;
-        }
         System.out.println("Pig Hit! Damage: " + damage + ", Remaining Health: " + pig.getHealth());
     }
 
@@ -765,7 +821,7 @@ public class Level_1_birds implements Screen, ContactListener {
         System.out.println("Bird Mass: " + birdMass);
 
         // Calculate damage based on momentum
-        float damage = Math.max(10f, collisionSpeed * birdMass * 10f);
+        float damage = Math.max(10f, collisionSpeed * birdMass * 6f);
         System.out.println("Calculated Damage to Wood Structure: " + damage);
 
         // Apply damage to the wood structure
@@ -777,9 +833,6 @@ public class Level_1_birds implements Screen, ContactListener {
 
         if (woodStructure.getCurrentHealth() <= 0) {
             System.out.println("Wood Structure Marked for Destruction!");
-        }
-        if (woodStructure.getCurrentHealth() <= 0) {
-            score += 100;
         }
     }
 
@@ -798,7 +851,7 @@ public class Level_1_birds implements Screen, ContactListener {
         System.out.println("Wood Structure Mass: " + woodStructureMass);
 
         // Calculate damage based on momentum
-        float damage = Math.max(5f, collisionSpeed * woodStructureMass * 5f);
+        float damage = Math.max(5f, collisionSpeed * woodStructureMass * 2f);
         System.out.println("Calculated Damage to Pig: " + damage);
 
         pig.takeDamage(damage);
@@ -817,6 +870,7 @@ public class Level_1_birds implements Screen, ContactListener {
                         ((WoodStructure) structure).getBody() :
                         ((WoodStructureHorizontal) structure).getBody()
                 );
+                score += 100;
                 structure.dispose();
                 structuresToRemove.add(structure);
             }
@@ -826,6 +880,7 @@ public class Level_1_birds implements Screen, ContactListener {
         for (Pig pig : pigs) {
             if (!pig.isAlive()) {
                 world.destroyBody(pig.getPigBody());
+                score += 1000;
                 pig.dispose();
                 pigsToRemove.add(pig);
             }

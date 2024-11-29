@@ -8,25 +8,25 @@ import com.badlogic.gdx.utils.ScreenUtils;
 
 public class LoadingScreen implements Screen {
     private Main game;
-    private Texture loadingImageTexture;
     private Texture backgroundTexture;
-    private Texture bottomLeftImageTexture;
     private SpriteBatch spriteBatch;
     private float elapsedTime;
     private boolean loadGame;
+    private int currentLevel;
 
     public LoadingScreen(Main game, boolean loadGame) {
+        this(game, loadGame, 1);
+    }
+
+    public LoadingScreen(Main game, boolean loadGame, int currentLevel) {
         this.game = game;
         this.loadGame = loadGame;
+        this.currentLevel = currentLevel;
     }
 
     @Override
     public void show() {
-
-        loadingImageTexture = new Texture(Gdx.files.internal("loadingnew.png"));
-        backgroundTexture = new Texture(Gdx.files.internal("wallpaperflare.com_wallpaper.jpg"));
-        bottomLeftImageTexture = new Texture(Gdx.files.internal("tipnew.png"));
-
+        backgroundTexture = new Texture(Gdx.files.internal("loadingnew.png"));
         spriteBatch = new SpriteBatch();
         elapsedTime = 0f;
     }
@@ -37,26 +37,31 @@ public class LoadingScreen implements Screen {
         elapsedTime += delta;
 
         spriteBatch.begin();
-
         spriteBatch.draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
-        float screenWidth = Gdx.graphics.getWidth();
-
-        float loadingImageWidth = loadingImageTexture.getWidth();
-
-        spriteBatch.draw(loadingImageTexture, screenWidth - loadingImageWidth, 0);
-
-        float scaledWidth = bottomLeftImageTexture.getWidth() * 1.6f;
-        float scaledHeight = bottomLeftImageTexture.getHeight() * 1.6f;
-        spriteBatch.draw(bottomLeftImageTexture, 0, 0, scaledWidth, scaledHeight);
         spriteBatch.end();
 
         if (elapsedTime > 2.0f) {
-            if (loadGame) {
-                game.setScreen(new Level_1_birds(game));
-            } else {
-                game.setScreen(new PlayAsScreen(game));
+            Screen nextScreen;
+            switch (currentLevel) {
+                case 1:
+                    nextScreen = new Level_1_birds(game);
+                    break;
+                case 2:
+                    nextScreen = new Level_2_Birds(game);
+                    break;
+                case 3:
+                    nextScreen = new Level_3_birds(game);
+                    break;
+                default:
+                    nextScreen = new Level_1_birds(game);
+                    break;
             }
+
+            if (!loadGame) {
+                nextScreen = new PlayAsScreen(game);
+            }
+
+            game.setScreen(nextScreen);
         }
     }
 
@@ -74,9 +79,7 @@ public class LoadingScreen implements Screen {
 
     @Override
     public void dispose() {
-        loadingImageTexture.dispose();
         backgroundTexture.dispose();
-        bottomLeftImageTexture.dispose();
         spriteBatch.dispose();
     }
 }

@@ -18,6 +18,10 @@ public abstract class Pig {
     protected float maxHealth;  // Added to track maximum health
     protected boolean isAlive;
 
+    public void setAlive(boolean alive) {
+        isAlive = alive;
+    }
+
     // Constructor with default implementation
     public Pig(World world, float x, float y, String texturePath, float radius) {
         // Initialize texture
@@ -34,7 +38,7 @@ public abstract class Pig {
 
         // Create fixture definition
         FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.density = 3f;
+        fixtureDef.density = 5f;
         fixtureDef.shape = pigShape;
         fixtureDef.friction = 100f;
         fixtureDef.restitution = 0f;

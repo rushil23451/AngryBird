@@ -2,7 +2,10 @@ package com.angrybirds;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -11,51 +14,91 @@ import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 
 public class WinScreen implements Screen {
 
     private SpriteBatch batch;
     private Texture backgroundTexture;
-    private Texture victoryTexture;
     private Texture levelsButtonTexture;
-    private Texture forwardButtonTexture;
+    private Texture nextLevelButtonTexture;
     private Stage stage;
     private Main game;
+    private int currentLevel;
+    private int score;
+    private Music backgroundMusic;
+    private BitmapFont scoreFont;
+
+    private float scoreX;
+    private float scoreY;
 
     // Constants for button dimensions and positioning
     private static final float BUTTON_WIDTH = 150f;
     private static final float BUTTON_HEIGHT = 150f;
     private static final float BOTTOM_PADDING = 20f; // Space from bottom of screen
     private static final float SIDE_PADDING = 20f;   // Space from sides of screen
+    private static final int MAX_LEVELS = 3; // Maximum number of levels
 
-    public WinScreen(Main game) {
+    public WinScreen(Main game, int completedLevel, int score) {
         this.game = game;
+        this.currentLevel = completedLevel;
+        this.score = score;
         batch = new SpriteBatch();
+
+        // Initialize font
+        scoreFont = new BitmapFont();
+        scoreFont.setColor(Color.WHITE);
+        scoreFont.getData().setScale(2f); // Adjust size as needed
+    }
+
+    // Method to set custom score display coordinates
+    public void setScoreDisplayCoordinates(float x, float y) {
+        this.scoreX = x;
+        this.scoreY = y;
     }
 
     @Override
     public void show() {
-        backgroundTexture = new Texture(Gdx.files.internal("victory screen.jpg"));
-        victoryTexture = new Texture(Gdx.files.internal("vctory.png"));
-        levelsButtonTexture = new Texture(Gdx.files.internal("LEVELS_BUTTON-Photoroom.png"));
-        forwardButtonTexture = new Texture(Gdx.files.internal("forwardbutton.png"));
+        // Choose background and music based on score
+        if (score > 2300) {
+            backgroundTexture = new Texture(Gdx.files.internal("victory_silver_screen.jpeg"));
+            backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("myinstants.mp3"));
+
+            // Default coordinates for gold screen
+            setScoreDisplayCoordinates(
+                Gdx.graphics.getWidth() * 0.45f,
+                Gdx.graphics.getHeight() * 0.7f
+            );
+        } else if (score > 2100) {
+            backgroundTexture = new Texture(Gdx.files.internal("victory_gold_screen.jpeg"));
+            backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("myinstants.mp3"));
+
+            // Default coordinates for silver screen
+            setScoreDisplayCoordinates(
+                Gdx.graphics.getWidth() * 0.45f,
+                Gdx.graphics.getHeight() * 0.7f
+            );
+        } else {
+            backgroundTexture = new Texture(Gdx.files.internal("victory_bronze_screen.jpeg"));
+            backgroundMusic = Gdx.audio.newMusic(Gdx.files.internal("myinstants.mp3"));
+
+            // Default coordinates for bronze screen
+            setScoreDisplayCoordinates(
+                Gdx.graphics.getWidth() * 0.45f,
+                Gdx.graphics.getHeight() * 0.7f
+            );
+        }
+
+        // Configure music playback
+        backgroundMusic.setLooping(false);
+        backgroundMusic.setVolume(0.5f);
+        backgroundMusic.play();
+
+        levelsButtonTexture = new Texture(Gdx.files.internal("backbuttonremoved.png"));
+        nextLevelButtonTexture = new Texture(Gdx.files.internal("nextbutton.png"));
 
         stage = new Stage();
         Gdx.input.setInputProcessor(stage);
-
-        // Victory button (center)
-        ImageButton victoryButton = new ImageButton(new TextureRegionDrawable(victoryTexture));
-        victoryButton.setSize(308 * 2, 91 * 2);
-        victoryButton.setPosition(
-            (Gdx.graphics.getWidth() - victoryButton.getWidth()) / 2,
-            (Gdx.graphics.getHeight() - victoryButton.getHeight()) / 2
-        );
-        victoryButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new FirstScreen(game));
-            }
-        });
 
         // Levels button (bottom left)
         ImageButton levelsButton = new ImageButton(new TextureRegionDrawable(levelsButtonTexture));
@@ -64,6 +107,7 @@ public class WinScreen implements Screen {
         levelsButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                stopMusic();
                 System.out.println("LEVELS button clicked");
                 game.setScreen(new LevelSelectionBirds(game));
             }
@@ -80,38 +124,69 @@ public class WinScreen implements Screen {
                 levelsButton.setPosition(levelsButton.getX() - 5, levelsButton.getY() - 5);
             }
         });
+        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
+        style.up = null;
+        style.down = null;
+        style.checked = null;
 
-        // Forward button (bottom right)
-        ImageButton forwardButton = new ImageButton(new TextureRegionDrawable(forwardButtonTexture));
-        forwardButton.setSize(BUTTON_WIDTH, BUTTON_HEIGHT);
-        forwardButton.setPosition(
-            Gdx.graphics.getWidth() - BUTTON_WIDTH - SIDE_PADDING,
+        // Next Level button (centered)
+        ImageButton nextLevelButton = new ImageButton(style); // Remove the texture
+        nextLevelButton.setSize(BUTTON_WIDTH+50, BUTTON_HEIGHT+50);
+        nextLevelButton.setPosition(
+            (Gdx.graphics.getWidth() - BUTTON_WIDTH) / 2f,
             BOTTOM_PADDING
         );
-        forwardButton.addListener(new ClickListener() {
+        nextLevelButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                System.out.println("FORWARD button clicked");
-                // Note: You'll need to specify the next screen here
-                // game.setScreen(new NextLevelScreen(game));
+                stopMusic();
+                System.out.println("NEXT LEVEL button clicked");
+
+                // Navigate to the next level
+                Screen nextLevelScreen;
+                switch (currentLevel) {
+                    case 1:
+                        nextLevelScreen = new Level_2_Birds(game);
+                        break;
+                    case 2:
+                        nextLevelScreen = new Level_3_birds(game);
+                        break;
+                    default:
+                        nextLevelScreen = new Level_1_birds(game);
+                        break;
+                }
+                game.setScreen(nextLevelScreen);
             }
 
             @Override
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                forwardButton.setSize(BUTTON_WIDTH - 10, BUTTON_HEIGHT - 10);
-                forwardButton.setPosition(forwardButton.getX() + 5, forwardButton.getY() + 5);
+                nextLevelButton.setSize(BUTTON_WIDTH - 10, BUTTON_HEIGHT - 10);
+                nextLevelButton.setPosition(
+                    (Gdx.graphics.getWidth() - (BUTTON_WIDTH - 10)) / 2f,
+                    BOTTOM_PADDING + 5
+                );
             }
 
             @Override
             public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-                forwardButton.setSize(BUTTON_WIDTH, BUTTON_HEIGHT);
-                forwardButton.setPosition(forwardButton.getX() - 5, forwardButton.getY() - 5);
+                nextLevelButton.setSize(BUTTON_WIDTH, BUTTON_HEIGHT);
+                nextLevelButton.setPosition(
+                    (Gdx.graphics.getWidth() - BUTTON_WIDTH) / 2f,
+                    BOTTOM_PADDING
+                );
             }
         });
 
-        stage.addActor(victoryButton);
         stage.addActor(levelsButton);
-        stage.addActor(forwardButton);
+        stage.addActor(nextLevelButton);
+    }
+
+    // Method to stop music
+    private void stopMusic() {
+        if (backgroundMusic != null) {
+            backgroundMusic.stop();
+            backgroundMusic.dispose();
+        }
     }
 
     @Override
@@ -119,7 +194,12 @@ public class WinScreen implements Screen {
         ScreenUtils.clear(0, 0, 0, 1);
 
         batch.begin();
+        // Draw background
         batch.draw(backgroundTexture, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+
+        // Draw score
+        scoreFont.draw(batch, "Score: " + score, scoreX, scoreY);
+
         batch.end();
 
         stage.act(delta);
@@ -133,6 +213,7 @@ public class WinScreen implements Screen {
 
     @Override
     public void pause() {
+        stopMusic();
     }
 
     @Override
@@ -141,16 +222,18 @@ public class WinScreen implements Screen {
 
     @Override
     public void hide() {
+        stopMusic();
         dispose();
     }
 
     @Override
     public void dispose() {
         batch.dispose();
+        stopMusic(); // Ensure music is stopped and resources are freed
         if (backgroundTexture != null) backgroundTexture.dispose();
-        if (victoryTexture != null) victoryTexture.dispose();
         if (levelsButtonTexture != null) levelsButtonTexture.dispose();
-        if (forwardButtonTexture != null) forwardButtonTexture.dispose();
+        if (nextLevelButtonTexture != null) nextLevelButtonTexture.dispose();
+        if (scoreFont != null) scoreFont.dispose();
         stage.dispose();
     }
 }
